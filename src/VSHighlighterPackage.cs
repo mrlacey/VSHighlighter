@@ -15,9 +15,13 @@ public sealed class VSHighlighterPackage : AsyncPackage
 {
 	public const string PackageGuidString = "bdb718d6-5369-48b4-9185-f27c969759b2";
 
+	public static AsyncPackage Instance;
+
 	protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 	{
 		await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+		Instance = this;
 
 		await TrackBasicUsageAnalyticsAsync();
 	}
