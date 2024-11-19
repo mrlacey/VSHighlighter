@@ -13,7 +13,9 @@ internal sealed class HighlightAdornmentTextViewCreationListener : IWpfTextViewC
 	[Export(typeof(AdornmentLayerDefinition))]
 	[Name("HighlightAdornment")]
 	[Order(After = PredefinedAdornmentLayers.Selection, Before = PredefinedAdornmentLayers.Text)]
-	private AdornmentLayerDefinition editorAdornmentLayer;
+#pragma warning disable 414 // unused field
+	private AdornmentLayerDefinition editorAdornmentLayer = null;
+#pragma warning restore 414
 
 	[Import]
 	internal ITextDocumentFactoryService docFactory = null;

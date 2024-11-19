@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Utilities;
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Tagging;
+using Microsoft.VisualStudio.Utilities;
 
 namespace VSHighlighter.Visuals;
 
@@ -13,9 +13,9 @@ namespace VSHighlighter.Visuals;
 class MarginTaggerProvider : ITaggerProvider
 {
 	[Import]
-	internal IClassifierAggregatorService AggregatorService;
+	internal IClassifierAggregatorService AggregatorService = null;
 
-		[Import]
+	[Import]
 	internal ITextDocumentFactoryService docFactory = null;
 
 	public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag

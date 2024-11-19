@@ -4,34 +4,40 @@ namespace VSHighlighter;
 
 internal class HighlighterService
 {
+	private List<Highlight> highlights = new();
+
 	private static HighlighterService instance;
 	public static HighlighterService Instance => instance ??= new HighlighterService();
 
 	public HighlighterService()
 	{
 		// TODO: Load any data from disk
+		highlights.Add(new Highlight
+		{
+			FileName = "Program.cs",
+			SpanStart = 105,
+			SpanLength = 85,
+			Color = HighlightColor.DarkTurquoise,
+			Content = "TODO: Implement this"
+		});
+		highlights.Add(new Highlight
+		{
+			FileName = "Program.cs",
+			SpanStart = 260,
+			SpanLength = 55,
+			Color = HighlightColor.Fuchsia,
+			Content = "TODO: Implement this"
+		});
 	}
 
 	internal IEnumerable<Highlight> GetHighlights(string fileName)
 	{
-		return new List<Highlight>
+		foreach (var item in highlights)
 		{
-			new Highlight
+			if (item.FileName == fileName)
 			{
-				FileName = fileName,
-				SpanStart = 105,
-				SpanLength = 85,
-				Color = HighlightColor.DarkTurquoise,
-				Content = "TODO: Implement this"
-			},
-			new Highlight
-			{
-				FileName = fileName,
-				SpanStart = 260,
-				SpanLength = 55,
-				Color = HighlightColor.Fuchsia,
-				Content = "TODO: Implement this"
-			},
-		};
+				yield return item;
+			}
+		}
 	}
 }

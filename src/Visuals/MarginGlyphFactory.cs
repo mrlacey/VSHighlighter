@@ -1,9 +1,8 @@
-﻿using Microsoft.VisualStudio.Shell.Interop;
+﻿using System.Windows;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
-using System.Windows.Shapes;
-using System.Windows;
 
 namespace VSHighlighter.Visuals;
 
@@ -16,10 +15,12 @@ internal class MarginGlyphFactory : IGlyphFactory
 		// Ensure we can draw a glyph for this marker.
 		if (tag != null && tag is MarginTag marginTag)
 		{
-			System.Windows.Shapes.Ellipse ellipse = new Ellipse();
-			ellipse.Fill = marginTag.Color.ToBrush();
-			ellipse.Height = m_glyphSize;
-			ellipse.Width = m_glyphSize;
+			System.Windows.Shapes.Ellipse ellipse = new()
+			{
+				Fill = marginTag.Color.ToBrush(),
+				Height = m_glyphSize,
+				Width = m_glyphSize
+			};
 
 			ellipse.MouseLeftButtonDown += Ellipse_MouseLeftButtonDown;
 
@@ -33,6 +34,8 @@ internal class MarginGlyphFactory : IGlyphFactory
 
 	private void Ellipse_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 	{
+		// TODO: remove relevant highlight
+
 		// Show a message box to prove we were here
 		VsShellUtilities.ShowMessageBox(
 			VSHighlighterPackage.Instance,

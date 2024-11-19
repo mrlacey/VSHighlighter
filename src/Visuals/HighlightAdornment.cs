@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Odbc;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text;
@@ -86,7 +85,7 @@ internal sealed class HighlightAdornment
 			foreach (var highlight in highlights)
 			{
 				var highlightSpan = new SnapshotSpan(line.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
-				
+
 				if (highlightSpan.IntersectsWith(lineSpan))
 				{
 					// TODO: need to handle highlights that don't cover the whole line.

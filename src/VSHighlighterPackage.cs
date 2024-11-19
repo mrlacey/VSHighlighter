@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -15,7 +12,12 @@ public sealed class VSHighlighterPackage : AsyncPackage
 {
 	public const string PackageGuidString = "bdb718d6-5369-48b4-9185-f27c969759b2";
 
+	// TODO: Need to ensure package loaded before accessing this.
 	public static AsyncPackage Instance;
+
+	// TODO: Add buttons for each color
+	// TODO: add menu options to highlight selection
+	// TODO: add menu options to clear all highlights in the document
 
 	protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 	{

@@ -1,16 +1,4 @@
-﻿using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Utilities;
-using System.Collections.Generic;
-using System;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text.Formatting;
-using System.Windows.Shapes;
-using System.ComponentModel.Composition;
-
-namespace VSHighlighter;
+﻿namespace VSHighlighter;
 
 internal class Highlight
 {

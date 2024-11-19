@@ -9,7 +9,9 @@ internal class MarginTagger : ITagger<MarginTag>
 {
 	private readonly ITextDocumentFactoryService docFactory;
 
+#pragma warning disable 67 // unused event - but required by interface
 	public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+#pragma warning restore 67
 
 	internal MarginTagger(ITextDocumentFactoryService docFactory)
 	{
