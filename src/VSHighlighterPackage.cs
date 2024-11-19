@@ -7,52 +7,51 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
-namespace VSHighlighter
+namespace VSHighlighter;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+[Guid(VSHighlighterPackage.PackageGuidString)]
+public sealed class VSHighlighterPackage : AsyncPackage
 {
-	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-	[Guid(VSHighlighterPackage.PackageGuidString)]
-	public sealed class VSHighlighterPackage : AsyncPackage
+	public const string PackageGuidString = "bdb718d6-5369-48b4-9185-f27c969759b2";
+
+	protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 	{
-		public const string PackageGuidString = "bdb718d6-5369-48b4-9185-f27c969759b2";
+		await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-		protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+		await TrackBasicUsageAnalyticsAsync();
+	}
+
+	private static async Task TrackBasicUsageAnalyticsAsync()
+	{
+		try
 		{
-			await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-			await TrackBasicUsageAnalyticsAsync();
+#if !DEBUG
+		if (string.IsNullOrWhiteSpace(AnalyticsConfig.TelemetryConnectionString))
+		{
+			return;
 		}
 
-		private static async Task TrackBasicUsageAnalyticsAsync()
+		var config = new TelemetryConfiguration
 		{
-			try
-			{
-#if !DEBUG
-			if (string.IsNullOrWhiteSpace(AnalyticsConfig.TelemetryConnectionString))
-			{
-				return;
-			}
+			ConnectionString = AnalyticsConfig.TelemetryConnectionString,
+		};
 
-			var config = new TelemetryConfiguration
+		var client = new TelemetryClient(config);
+
+		var properties = new Dictionary<string, string>
 			{
-				ConnectionString = AnalyticsConfig.TelemetryConnectionString,
+				{ "VsixVersion", Vsix.Version },
+				{ "VsVersion", Microsoft.VisualStudio.Telemetry.TelemetryService.DefaultSession?.GetSharedProperty("VS.Core.ExeVersion") },
 			};
 
-			var client = new TelemetryClient(config);
-
-			var properties = new Dictionary<string, string>
-				{
-					{ "VsixVersion", Vsix.Version },
-					{ "VsVersion", Microsoft.VisualStudio.Telemetry.TelemetryService.DefaultSession?.GetSharedProperty("VS.Core.ExeVersion") },
-				};
-
-			client.TrackEvent(Vsix.Name, properties);
+		client.TrackEvent(Vsix.Name, properties);
 #endif
-			}
-			catch (Exception exc)
-			{
-				System.Diagnostics.Debug.WriteLine(exc);
-				await OutputPane.Instance.WriteAsync("Error tracking usage analytics: " + exc.Message);
-			}
+		}
+		catch (Exception exc)
+		{
+			System.Diagnostics.Debug.WriteLine(exc);
+			await OutputPane.Instance.WriteAsync("Error tracking usage analytics: " + exc.Message);
 		}
 	}
 }

@@ -1,25 +1,19 @@
 ﻿using System;
+using System.Windows.Media;
 
-namespace VSHighlighter
+namespace VSHighlighter;
+
+public static class HighlightColorsExtensions
 {
-	public static class HighlightColorsExtensions
+	public static SolidColorBrush ToBrush(this HighlightColor color)
 	{
-		public static SolidColorBrush ToBrush(this HighlightColor color)
+		return color switch
 		{
-			switch (color)
-			{
-				case HighlightColor.DarkTurquoise:
-					return new SolidColorBrush(Colors.DarkTurquoise);
-				case HighlightColor.Fuchsia:
-					return new SolidColorBrush(Colors.Fuchsia);
-				case HighlightColor.Gold:
-					return new SolidColorBrush(Colors.Gold);
-				case HighlightColor.Lime:
-					return new SolidColorBrush(Colors.Lime);
-				default:
-					throw new ArgumentOutOfRangeException(nameof(color), color, null);
-			}
-		}
+			HighlightColor.DarkTurquoise => new SolidColorBrush(Colors.DarkTurquoise),
+			HighlightColor.Fuchsia => new SolidColorBrush(Colors.Fuchsia),
+			HighlightColor.Gold => new SolidColorBrush(Colors.Gold),
+			HighlightColor.Lime => new SolidColorBrush(Colors.Lime),
+			_ => throw new ArgumentOutOfRangeException(nameof(color), color, null),
+		};
 	}
-
 }
