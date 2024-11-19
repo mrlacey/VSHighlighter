@@ -11,7 +11,7 @@ namespace VSHighlighter
         public const string Name = "Highlighter";
         public const string Description = @"Highlight parts of code to make them easier to see and find.";
         public const string Language = "en-US";
-        public const string Version = "1.0";
+        public const string Version = "0.1";
         public const string Author = "Matt Lacey";
         public const string Tags = "";
     }
