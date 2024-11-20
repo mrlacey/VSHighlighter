@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -18,23 +17,18 @@ internal class HighlighterService
 
 	public HighlighterService()
 	{
-		// TODO: Load any data from disk
-		highlights.Add(new Highlight
+		if (File.Exists(filePath))
 		{
-			FilePath = "C:\\Users\\matt\\source\\repos\\CsInlineColorTest\\MauiApp1\\MauiProgram.cs",
-			SpanStart = 105,
-			SpanLength = 85,
-			Color = HighlightColor.Lime,
-			Content = string.Empty
-		});
-		highlights.Add(new Highlight
-		{
-			FilePath = "C:\\Users\\matt\\source\\repos\\CsInlineColorTest\\MauiApp1\\MauiProgram.cs",
-			SpanStart = 260,
-			SpanLength = 55,
-			Color = HighlightColor.Gold,
-			Content = string.Empty
-		});
+			try
+			{
+				string jsonString = File.ReadAllText(filePath);
+				highlights = JsonConvert.DeserializeObject<List<Highlight>>(jsonString);
+			}
+			catch (Exception ex)
+			{
+				_ = OutputPane.Instance.WriteAsync($"Error loading highlights: {ex.Message}");
+			}
+		}
 	}
 
 	private async Task SaveAsync()
