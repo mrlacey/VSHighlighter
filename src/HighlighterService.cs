@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.VisualStudio.Text;
 
 namespace VSHighlighter;
 
@@ -18,7 +19,7 @@ internal class HighlighterService
 			SpanStart = 105,
 			SpanLength = 85,
 			Color = HighlightColor.Lime,
-			Content = "TODO: Implement this"
+			Content = string.Empty
 		});
 		highlights.Add(new Highlight
 		{
@@ -26,7 +27,7 @@ internal class HighlighterService
 			SpanStart = 260,
 			SpanLength = 55,
 			Color = HighlightColor.Gold,
-			Content = "TODO: Implement this"
+			Content = string.Empty
 		});
 	}
 
@@ -39,5 +40,19 @@ internal class HighlighterService
 				yield return item;
 			}
 		}
+	}
+
+	internal void AddHighlight(string filePath, HighlightColor color, int start, int length)
+	{
+		highlights.Add(new Highlight
+		{
+			FilePath = filePath,
+			SpanStart = start,
+			SpanLength = length,
+			Color = color,
+			Content = string.Empty
+		});
+
+		Messenger.RequestReloadHighlights();
 	}
 }

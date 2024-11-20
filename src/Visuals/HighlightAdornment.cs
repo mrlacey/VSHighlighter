@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
@@ -34,6 +35,8 @@ internal sealed class HighlightAdornment
 		this.docFactory = docFactory;
 		this.view.LayoutChanged += this.OnLayoutChanged;
 
+		Messenger.ReloadHighlights += OnReloadHighlightsRequested;
+
 		// Use semi-opaque to not hide underlying text
 		byte fiftyPercent = 255 / 2;
 
@@ -53,6 +56,22 @@ internal sealed class HighlightAdornment
 		penBrush.Freeze();
 		this.pen = new Pen(penBrush, thickness: 0.5);
 		this.pen.Freeze();
+	}
+
+	private async void OnReloadHighlightsRequested()
+	{
+		await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+		// Get the span of the entire document
+		var entireSpan = new SnapshotSpan(this.view.TextSnapshot, 0, this.view.TextSnapshot.Length);
+
+		// Get all the lines in the document
+		var textViewLines = this.view.TextViewLines.GetTextViewLinesIntersectingSpan(entireSpan);
+
+		foreach (var line in textViewLines)
+		{
+			this.CreateVisuals(line);
+		}
 	}
 
 	/// <summary>

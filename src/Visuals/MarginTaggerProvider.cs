@@ -25,6 +25,6 @@ class MarginTaggerProvider : ITaggerProvider
 			throw new ArgumentNullException("buffer");
 		}
 
-		return new MarginTagger(docFactory) as ITagger<T>;
+		return new MarginTagger(docFactory, buffer) as ITagger<T>;
 	}
 }
