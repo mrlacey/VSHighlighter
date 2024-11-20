@@ -84,12 +84,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -103,9 +103,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights">
       <Version>2.22.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CSharp">
-      <Version>4.7.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.IO.Redist">
       <Version>6.1.0</Version>
@@ -133,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="VSHighlighterPackage.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
       <Generator>VsctGenerator</Generator>
       <LastGenOutput>VSHighlighterPackage1.cs</LastGenOutput>
     </VSCTCompile>

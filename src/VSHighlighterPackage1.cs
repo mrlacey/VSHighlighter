@@ -20,6 +20,12 @@ namespace VSHighlighter
 
         public const string guidImagesString = "d2da83db-1ef6-49f0-9670-7b237baa363b";
         public static Guid guidImages = new Guid(guidImagesString);
+
+        public const string guidCshtmlCodeEditorString = "78f03954-2fb8-4087-8ce7-59d71710b3bb";
+        public static Guid guidCshtmlCodeEditor = new Guid(guidCshtmlCodeEditorString);
+
+        public const string GuidVisualStudioXAMLWindowContextMenuString = "4c87b692-1202-46aa-b64c-ef01faec53da";
+        public static Guid GuidVisualStudioXAMLWindowContextMenu = new Guid(GuidVisualStudioXAMLWindowContextMenuString);
     }
     /// <summary>
     /// Helper class that encapsulates all CommandIDs uses across VS Package.
@@ -37,5 +43,6 @@ namespace VSHighlighter
         public const int bmpLime = 0x0004;
         public const int bmpPicArrows = 0x0005;
         public const int bmpPicStrikethrough = 0x0006;
+        public const int IDVisualStudioXAMLWindowContextMenu = 0x0103;
     }
 }

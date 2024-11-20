@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <Extern href="stdidcmd.h"/>
-  <Extern href="vsshlids.h"/>
+	<Extern href="stdidcmd.h"/>
+	<Extern href="vsshlids.h"/>
 
-  <Commands package="guidVSHighlighterPackage">
+	<Commands package="guidVSHighlighterPackage">
 	<!-- Inside this section we have different sub-sections: one for the menus, another
 	for the menu groups, one for the buttons (the actual commands), one for the combos
 	and the last one for the bitmaps used. Each element is identified by a command id that
@@ -18,15 +18,15 @@
 		 group as the part of a menu contained between two lines. The parent of a group
 		 must be a menu. -->
 	<Groups>
-		<Group guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+		<!--<Group guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" priority="0x0600">
 			<Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
-		</Group>
+		</Group>-->
+		<Group guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" priority="0x0600" />
 		<Group guid="guidVSHighlighterPackageCmdSet" id="CodeContextGroup" priority="0x0600" />
 	</Groups>
 
 	<Buttons>
 		<Button guid="guidVSHighlighterPackageCmdSet" id="HighlightFuchsiaId" priority="0x0100" type="Button">
-			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages" id="bmpFuchsia" />
 			<Strings>
 				<ButtonText>Highlight with Fuchsia</ButtonText>
@@ -34,7 +34,6 @@
 			</Strings>
 		</Button>
 		<Button guid="guidVSHighlighterPackageCmdSet" id="HighlightGoldId" priority="0x0100" type="Button">
-			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 			<Icon guid="guidImages" id="bmpGold" />
 			<Strings>
 				<ButtonText>Highlight with Gold</ButtonText>
@@ -61,31 +60,36 @@
 	</VisibilityConstraints>
 
 	<CommandPlacements>
-		<!--<CommandPlacement guid="guidCollapseCommandPackageCmdSet" id="MyMenuGroup" priority="0x0600" >
-		<Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_EDIT" />-->
-		<!--<Parent guid="guidSHLMainMenu" id="{9ADF33D0-8AAD-11D0-B606-00A0C922E851}"/>-->
-
-		<!-- Below is for the outlining menu but not working - may need to allow for it to be in a subgroup? -->
-		<!--<Parent guid="guidStdEditor" id="IDM_VS_EDITOR_OUTLINING_MENU" />-->
-		<!--</CommandPlacement>-->
+		<!-- Add the context menu group to all editors where it might be wanted -->
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="CodeContextGroup" priority="0x0300" >
 			<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
 		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="CodeContextGroup" priority="0x0200">
+			<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_EDITOR_ALL" />
+		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="CodeContextGroup" priority="0x0200">
+			<Parent guid="GuidVisualStudioXAMLWindowContextMenu" id="IDVisualStudioXAMLWindowContextMenu" />
+		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="CodeContextGroup" priority="0x0200">
+			<Parent guid="guidCshtmlCodeEditor" id="IDM_VS_TOOL_STANDARD" />
+		</CommandPlacement>
 
+		<!-- Put the Context menu in the group added to all context menus -->
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="CodeContextMenu" priority="0x0600" >
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="CodeContextGroup"/>
 		</CommandPlacement>
+		<!-- Put the commands group in the Context menu -->
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" priority="0x0600" >
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="CodeContextMenu"/>
 		</CommandPlacement>
-		
+
+		<!-- Put all the commands in a group -->
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightFuchsiaId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightGoldId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
-
 	</CommandPlacements>
 	
 	<Symbols>
@@ -109,6 +113,12 @@
 			<IDSymbol name="bmpLime" value="4" />
 			<IDSymbol name="bmpPicArrows" value="5" />
 			<IDSymbol name="bmpPicStrikethrough" value="6" />
+		</GuidSymbol>
+
+		<!-- These symbols are redefined here to give meaningful names to the values -->
+		<GuidSymbol name="guidCshtmlCodeEditor" value="{78F03954-2FB8-4087-8CE7-59D71710B3BB}" />
+		<GuidSymbol name="GuidVisualStudioXAMLWindowContextMenu" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">
+			<IDSymbol name="IDVisualStudioXAMLWindowContextMenu" value="0x0103" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>
