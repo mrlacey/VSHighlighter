@@ -47,6 +47,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnalyticsConfig.cs" />
+    <Compile Include="Commands\HighlightFuchsia.cs" />
+    <Compile Include="Commands\HighlightGold.cs" />
     <Compile Include="Highlight.cs" />
     <Compile Include="HighlightColor.cs" />
     <Compile Include="HighlightColorsExtensions.cs" />
@@ -66,6 +68,11 @@
     <Compile Include="Visuals\MarginTagger.cs" />
     <Compile Include="Visuals\MarginTaggerProvider.cs" />
     <Compile Include="VSHighlighterPackage.cs" />
+    <Compile Include="VSHighlighterPackage1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VSHighlighterPackage.vsct</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -83,6 +90,9 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
@@ -122,19 +132,22 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <VSCTCompile Include="VSHighlighterPackage.vsct">
+      <Generator>VsctGenerator</Generator>
+      <LastGenOutput>VSHighlighterPackage1.cs</LastGenOutput>
+    </VSCTCompile>
     <Content Include="filestosign.txt" />
     <Content Include="LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Resources\CommandIcons.png" />
     <Content Include="Resources\HighlightText.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

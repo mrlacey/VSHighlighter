@@ -32,17 +32,28 @@ internal class MarginGlyphFactory : IGlyphFactory
 		}
 	}
 
-	private void Ellipse_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+#pragma warning disable VSTHRD100 // Avoid async void methods
+	private async void Ellipse_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
 	{
-		// TODO: remove relevant highlight
+		try
+		{
+			// TODO: remove relevant highlight
 
-		// Show a message box to prove we were here
-		VsShellUtilities.ShowMessageBox(
-			VSHighlighterPackage.Instance,
-			"ellipse clicked",
-			"msgbox title",
-			OLEMSGICON.OLEMSGICON_INFO,
-			OLEMSGBUTTON.OLEMSGBUTTON_OK,
-			OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+			await VSHighlighterPackage.EnsureInstanceLoadedAsync();
+
+			// Show a message box to prove we were here
+			VsShellUtilities.ShowMessageBox(
+				VSHighlighterPackage.Instance,
+				"ellipse clicked",
+				"msgbox title",
+				OLEMSGICON.OLEMSGICON_INFO,
+				OLEMSGBUTTON.OLEMSGBUTTON_OK,
+				OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+		}
+		catch (System.Exception exc)
+		{
+			await OutputPane.Instance.WriteAsync(exc.Message);
+		}
 	}
 }

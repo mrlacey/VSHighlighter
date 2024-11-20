@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using VSHighlighter.Commands;
 using Task = System.Threading.Tasks.Task;
 
 namespace VSHighlighter;
 
+[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-[Guid(VSHighlighterPackage.PackageGuidString)]
+[InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)] // Info on this package for Help/About
+[Guid(PackageGuids.guidVSHighlighterPackageString)]
+[ProvideMenuResource("Menus.ctmenu", 1)]
 public sealed class VSHighlighterPackage : AsyncPackage
 {
-	public const string PackageGuidString = "bdb718d6-5369-48b4-9185-f27c969759b2";
-
-	// TODO: Need to ensure package loaded before accessing this.
 	public static AsyncPackage Instance;
 
 	// TODO: Add buttons for each color
@@ -24,6 +27,9 @@ public sealed class VSHighlighterPackage : AsyncPackage
 		await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
 		Instance = this;
+
+		await HighlightFuchsia.InitializeAsync(this);
+		await HighlightGold.InitializeAsync(this);
 
 		await TrackBasicUsageAnalyticsAsync();
 	}
@@ -58,6 +64,21 @@ public sealed class VSHighlighterPackage : AsyncPackage
 		{
 			System.Diagnostics.Debug.WriteLine(exc);
 			await OutputPane.Instance.WriteAsync("Error tracking usage analytics: " + exc.Message);
+		}
+	}
+
+	internal static async Task EnsureInstanceLoadedAsync()
+	{
+		await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+		if (VSHighlighterPackage.Instance == null)
+		{
+			// Try and force load the project if it hasn't already loaded
+			// so can access the configured options.
+			if (ServiceProvider.GlobalProvider.GetService(typeof(SVsShell)) is IVsShell shell)
+			{
+				shell.LoadPackage(ref PackageGuids.guidVSHighlighterPackage, out _);
+			}
 		}
 	}
 }

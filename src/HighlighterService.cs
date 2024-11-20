@@ -14,18 +14,18 @@ internal class HighlighterService
 		// TODO: Load any data from disk
 		highlights.Add(new Highlight
 		{
-			FileName = "Program.cs",
+			FilePath = "C:\\Users\\matt\\source\\repos\\CsInlineColorTest\\MauiApp1\\MauiProgram.cs",
 			SpanStart = 105,
 			SpanLength = 85,
-			Color = HighlightColor.DarkTurquoise,
+			Color = HighlightColor.Lime,
 			Content = "TODO: Implement this"
 		});
 		highlights.Add(new Highlight
 		{
-			FileName = "Program.cs",
+			FilePath = "C:\\Users\\matt\\source\\repos\\CsInlineColorTest\\MauiApp1\\MauiProgram.cs",
 			SpanStart = 260,
 			SpanLength = 55,
-			Color = HighlightColor.Fuchsia,
+			Color = HighlightColor.Gold,
 			Content = "TODO: Implement this"
 		});
 	}
@@ -34,7 +34,7 @@ internal class HighlighterService
 	{
 		foreach (var item in highlights)
 		{
-			if (item.FileName == fileName)
+			if (item.FilePath == fileName)
 			{
 				yield return item;
 			}
