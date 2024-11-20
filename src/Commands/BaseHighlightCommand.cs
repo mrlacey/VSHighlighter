@@ -48,6 +48,13 @@ internal class BaseHighlightCommand
 						// TODO: review handling of multiple selections
 						var selectionSpan = selection.SelectedSpans[0];
 
+						if (selectionSpan.Length < 1)
+						{
+							var caretPosition = wpftextView.Caret.Position.BufferPosition;
+							var textViewLine = wpftextView.TextViewLines.GetTextViewLineContainingBufferPosition(caretPosition);
+							selectionSpan = new SnapshotSpan(textViewLine.Start, textViewLine.End);
+						}
+
 						// Get the file path of the document
 						var textDocumentFactoryService = componentModel.GetService<ITextDocumentFactoryService>();
 						if (textDocumentFactoryService.TryGetTextDocument(wpftextView.TextDataModel.DocumentBuffer, out ITextDocument textDocument))
