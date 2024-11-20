@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.Text;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VSHighlighter;
 
@@ -61,19 +60,26 @@ internal class HighlighterService
 		Messenger.RequestReloadHighlights();
 	}
 
-	internal void RemoveHighlight(string id)
+	internal async Task RemoveHighlightAsync(string id)
 	{
-		// TODO: might be nice to check that something was removed.
+		var itemRemoved = false;
+
 		foreach (var item in highlights)
 		{
 			if (item.Id == id)
 			{
-				// TODO: need to track details of what's been removed so it can be passed via the messenger
+				// TODO: need to track details of what's been removed so it can be passed via the messenger (Issue#1)
 				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
 
 				highlights.Remove(item);
+				itemRemoved = true;
 				break;
 			}
+		}
+
+		if (!itemRemoved)
+		{
+			await OutputPane.Instance.WriteAsync($"Failed to remove highlight '{id}'. Collection contained {highlights.Count} items.");
 		}
 
 		Messenger.RequestReloadHighlights();
@@ -83,7 +89,7 @@ internal class HighlighterService
 	{
 		System.Diagnostics.Debug.WriteLine($"Removing all highlights from '{filePath}'");
 
-		for (int i = highlights.Count - 1; i >= 0 ; i--)
+		for (int i = highlights.Count - 1; i >= 0; i--)
 		{
 			Highlight item = highlights[i];
 			if (item.FilePath == filePath)

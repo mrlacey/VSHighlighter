@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
+using Microsoft.VisualStudio.Threading;
 
 namespace VSHighlighter.Visuals;
 
@@ -39,7 +40,7 @@ internal class MarginGlyphFactory : IGlyphFactory
 	{
 		try
 		{
-			HighlighterService.Instance.RemoveHighlight(((System.Windows.Shapes.Ellipse)sender).Tag.ToString());
+			await HighlighterService.Instance.RemoveHighlightAsync(((System.Windows.Shapes.Ellipse)sender).Tag.ToString());
 		}
 		catch (System.Exception exc)
 		{

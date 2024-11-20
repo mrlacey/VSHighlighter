@@ -2,7 +2,7 @@
 
 public static class Messenger
 {
-	// TODO: have the reload request be filtered to the span of the specific file changed
+	// TODO: have the reload request be filtered to the span of the specific file changed (Issue#1)
 	public delegate void ReloadHighlightsEventHandler();
 
 	public static event ReloadHighlightsEventHandler ReloadHighlights;
