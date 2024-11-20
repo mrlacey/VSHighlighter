@@ -8,7 +8,7 @@ namespace VSHighlighter.Visuals;
 [Export(typeof(IGlyphFactoryProvider))]
 [Name("MarginGlyph")]
 [Order(After = "VsTextMarker")]
-[ContentType(StandardContentTypeNames.Text)]
+[ContentType(StandardContentTypeNames.Any)]
 [TagType(typeof(MarginTag))]
 internal sealed class MarginGlyphFactoryProvider : IGlyphFactoryProvider
 {

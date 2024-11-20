@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace VSHighlighter.Visuals;
 
 [Export(typeof(ITaggerProvider))]
-[ContentType(StandardContentTypeNames.Text)]
+[ContentType(StandardContentTypeNames.Any)]
 [TagType(typeof(MarginTag))]
 class MarginTaggerProvider : ITaggerProvider
 {

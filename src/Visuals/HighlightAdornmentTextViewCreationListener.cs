@@ -6,8 +6,8 @@ using Microsoft.VisualStudio.Utilities;
 namespace VSHighlighter.Visuals;
 
 [Export(typeof(IWpfTextViewCreationListener))]
-[ContentType(StandardContentTypeNames.Text)]
-[TextViewRole(PredefinedTextViewRoles.Document)]
+[ContentType(StandardContentTypeNames.Any)]
+[TextViewRole(PredefinedTextViewRoles.PrimaryDocument)]
 internal sealed class HighlightAdornmentTextViewCreationListener : IWpfTextViewCreationListener
 {
 	[Export(typeof(AdornmentLayerDefinition))]
