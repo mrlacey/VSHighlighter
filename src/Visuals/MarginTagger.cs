@@ -45,7 +45,7 @@ internal class MarginTagger : ITagger<MarginTag>
 					var highlightSpan = new SnapshotSpan(span.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
 					if (highlightSpan.IntersectsWith(span))
 					{
-						yield return new TagSpan<MarginTag>(highlightSpan, new MarginTag { Color = highlight.Color });
+						yield return new TagSpan<MarginTag>(highlightSpan, new MarginTag(highlight));
 					}
 				}
 			}

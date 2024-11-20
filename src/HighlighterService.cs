@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Text;
 
 namespace VSHighlighter;
@@ -44,14 +45,52 @@ internal class HighlighterService
 
 	internal void AddHighlight(string filePath, HighlightColor color, int start, int length)
 	{
-		highlights.Add(new Highlight
+		var newHighlight = new Highlight
 		{
 			FilePath = filePath,
 			SpanStart = start,
 			SpanLength = length,
 			Color = color,
 			Content = string.Empty
-		});
+		};
+
+		System.Diagnostics.Debug.WriteLine($"Adding highlight {newHighlight.Id} to {newHighlight.FilePath}");
+
+		highlights.Add(newHighlight);
+
+		Messenger.RequestReloadHighlights();
+	}
+
+	internal void RemoveHighlight(string id)
+	{
+		// TODO: might be nice to check that something was removed.
+		foreach (var item in highlights)
+		{
+			if (item.Id == id)
+			{
+				// TODO: need to track details of what's been removed so it can be passed via the messenger
+				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
+
+				highlights.Remove(item);
+				break;
+			}
+		}
+
+		Messenger.RequestReloadHighlights();
+	}
+
+	internal void RemoveAll(string filepath)
+	{
+		foreach (var item in highlights)
+		{
+			if (item.FilePath == filepath)
+			{
+				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
+
+				highlights.Remove(item);
+				break;
+			}
+		}
 
 		Messenger.RequestReloadHighlights();
 	}

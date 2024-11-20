@@ -19,10 +19,11 @@ internal class MarginGlyphFactory : IGlyphFactory
 			{
 				Fill = marginTag.Color.ToBrush(),
 				Height = m_glyphSize,
-				Width = m_glyphSize
+				Width = m_glyphSize,
+				Tag = marginTag.HighlightId,
 			};
 
-			ellipse.MouseLeftButtonDown += Ellipse_MouseLeftButtonDown;
+			ellipse.MouseRightButtonDown += OnMouseRightButtonDown;
 
 			return ellipse;
 		}
@@ -33,23 +34,12 @@ internal class MarginGlyphFactory : IGlyphFactory
 	}
 
 #pragma warning disable VSTHRD100 // Avoid async void methods
-	private async void Ellipse_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+	private async void OnMouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 #pragma warning restore VSTHRD100 // Avoid async void methods
 	{
 		try
 		{
-			// TODO: remove relevant highlight
-
-			await VSHighlighterPackage.EnsureInstanceLoadedAsync();
-
-			// Show a message box to prove we were here
-			VsShellUtilities.ShowMessageBox(
-				VSHighlighterPackage.Instance,
-				"ellipse clicked",
-				"msgbox title",
-				OLEMSGICON.OLEMSGICON_INFO,
-				OLEMSGBUTTON.OLEMSGBUTTON_OK,
-				OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+			HighlighterService.Instance.RemoveHighlight(((System.Windows.Shapes.Ellipse)sender).Tag.ToString());
 		}
 		catch (System.Exception exc)
 		{

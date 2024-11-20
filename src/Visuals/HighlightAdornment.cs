@@ -58,7 +58,9 @@ internal sealed class HighlightAdornment
 		this.pen.Freeze();
 	}
 
+#pragma warning disable VSTHRD100 // Avoid async void methods
 	private async void OnReloadHighlightsRequested()
+#pragma warning restore VSTHRD100 // Avoid async void methods
 	{
 		await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 

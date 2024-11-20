@@ -56,7 +56,7 @@ internal class BaseHighlightCommand
 
 							HighlighterService.Instance.AddHighlight(filePath, this.Color, selectionSpan.Start.Position, selectionSpan.Length);
 
-							// TODO: review including the selection in the highlight record
+							// TODO: review including the text of the selection in the highlight record
 							//textView.GetSelectedText(out var selText);
 						}
 						else
