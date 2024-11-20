@@ -44,6 +44,12 @@
 					<LocCanonicalName>.HighlightSelection.Lime</LocCanonicalName>
 				</Strings>
 			</Button>
+			<Button guid="guidVSHighlighterPackageCmdSet" id="ClearHighlightsId" priority="0x0100" type="Button">
+				<Strings>
+					<ButtonText>Clear all in document</ButtonText>
+					<LocCanonicalName>.HighlightSelection.Clear</LocCanonicalName>
+				</Strings>
+			</Button>
 		</Buttons>
 
 		<Menus>
@@ -107,6 +113,9 @@
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightLimeId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="ClearHighlightsId" priority="0x0600">
+			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
+		</CommandPlacement>
 
 		<!-- Add the commands to the toolbar -->
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightFuchsiaId" priority="0x0600">
@@ -136,6 +145,7 @@
 			<IDSymbol name="HighlightGoldId" value="0x0300" />
 			<IDSymbol name="HighlightTurquoiseId" value="0x0400" />
 			<IDSymbol name="HighlightLimeId" value="0x0500" />
+			<IDSymbol name="ClearHighlightsId" value="0x0600" />
 
 			<IDSymbol name="Toolbar" value="0x1000" />
 			<IDSymbol name="ToolbarGroup" value="0x1050" />

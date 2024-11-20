@@ -18,8 +18,6 @@ public sealed class VSHighlighterPackage : AsyncPackage
 {
 	public static AsyncPackage Instance;
 
-	// TODO: add menu option to clear all highlights in the document
-
 	protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 	{
 		await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
@@ -30,6 +28,7 @@ public sealed class VSHighlighterPackage : AsyncPackage
 		await HighlightGold.InitializeAsync(this);
 		await HighlightTurquoise.InitializeAsync(this);
 		await HighlightLime.InitializeAsync(this);
+		await ClearHighlights.InitializeAsync(this);
 
 		await TrackBasicUsageAnalyticsAsync();
 	}

@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AnalyticsConfig.cs" />
     <Compile Include="Commands\BaseHighlightCommand.cs" />
+    <Compile Include="Commands\ClearHighlights.cs" />
     <Compile Include="Commands\HighlightFuchsia.cs" />
     <Compile Include="Commands\HighlightGold.cs" />
     <Compile Include="Commands\HighlightLime.cs" />

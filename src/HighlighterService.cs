@@ -79,16 +79,18 @@ internal class HighlighterService
 		Messenger.RequestReloadHighlights();
 	}
 
-	internal void RemoveAll(string filepath)
+	internal void RemoveAll(string filePath)
 	{
-		foreach (var item in highlights)
+		System.Diagnostics.Debug.WriteLine($"Removing all highlights from '{filePath}'");
+
+		for (int i = highlights.Count - 1; i >= 0 ; i--)
 		{
-			if (item.FilePath == filepath)
+			Highlight item = highlights[i];
+			if (item.FilePath == filePath)
 			{
 				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
 
 				highlights.Remove(item);
-				break;
 			}
 		}
 
