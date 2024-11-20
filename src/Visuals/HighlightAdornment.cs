@@ -88,8 +88,40 @@ internal sealed class HighlightAdornment
 
 				if (highlightSpan.IntersectsWith(lineSpan))
 				{
-					// TODO: need to handle highlights that don't cover the whole line.
-					SnapshotSpan span = new(this.view.TextSnapshot, lineSpan);
+					var spanToUse = lineSpan;
+
+					if (highlightSpan.Start < lineSpan.Start)
+					{
+						// Highlight starts before the line
+
+						if (highlightSpan.End > lineSpan.End)
+						{
+							// highlight goes longer than the line so highlight the whole line
+							spanToUse = lineSpan;
+						}
+						else
+						{
+							// Only highlight up to the relevant point in the current line
+							spanToUse = new Span(lineSpan.Start, highlightSpan.End - lineSpan.Start);
+						}
+					}
+					else
+					{
+						// Highlight starts in the line
+
+						if (highlightSpan.End > lineSpan.End)
+						{
+							// Highlight goes longer than the line so highlight from the start of the highlight to the end of the line
+							spanToUse = new Span(highlightSpan.Start, lineSpan.End - highlightSpan.Start);
+						}
+						else
+						{
+							// Full highlight is within the line
+							spanToUse = highlightSpan.Span;
+						}
+					}
+
+					SnapshotSpan span = new(this.view.TextSnapshot, spanToUse);
 
 					Geometry geometry = textViewLines.GetMarkerGeometry(span);
 					if (geometry != null)
