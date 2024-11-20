@@ -30,6 +30,20 @@
 					<LocCanonicalName>.HighlightSelection.Gold</LocCanonicalName>
 				</Strings>
 			</Button>
+			<Button guid="guidVSHighlighterPackageCmdSet" id="HighlightTurquoiseId" priority="0x0100" type="Button">
+				<Icon guid="guidImages" id="bmpTurquoise" />
+				<Strings>
+					<ButtonText>Highlight with Turquoise</ButtonText>
+					<LocCanonicalName>.HighlightSelection.Turquoise</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="guidVSHighlighterPackageCmdSet" id="HighlightLimeId" priority="0x0100" type="Button">
+				<Icon guid="guidImages" id="bmpLime" />
+				<Strings>
+					<ButtonText>Highlight with Lime</ButtonText>
+					<LocCanonicalName>.HighlightSelection.Lime</LocCanonicalName>
+				</Strings>
+			</Button>
 		</Buttons>
 
 		<Menus>
@@ -87,12 +101,24 @@
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightGoldId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightTurquoiseId" priority="0x0600">
+			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightLimeId" priority="0x0600">
+			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
+		</CommandPlacement>
 
 		<!-- Add the commands to the toolbar -->
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightFuchsiaId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="ToolbarGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightGoldId" priority="0x0600">
+			<Parent guid="guidVSHighlighterPackageCmdSet" id="ToolbarGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightTurquoiseId" priority="0x0600">
+			<Parent guid="guidVSHighlighterPackageCmdSet" id="ToolbarGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightLimeId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="ToolbarGroup" />
 		</CommandPlacement>
 
@@ -105,8 +131,11 @@
 		<!-- This is the guid used to group the menu commands together -->
 		<GuidSymbol name="guidVSHighlighterPackageCmdSet" value="{e4e74e85-16cd-49f4-bf71-66aa948975ad}">
 			<IDSymbol name="MyMenuGroup" value="0x1020" />
+
 			<IDSymbol name="HighlightFuchsiaId" value="0x0200" />
 			<IDSymbol name="HighlightGoldId" value="0x0300" />
+			<IDSymbol name="HighlightTurquoiseId" value="0x0400" />
+			<IDSymbol name="HighlightLimeId" value="0x0500" />
 
 			<IDSymbol name="Toolbar" value="0x1000" />
 			<IDSymbol name="ToolbarGroup" value="0x1050" />

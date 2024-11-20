@@ -7,21 +7,21 @@ using Task = System.Threading.Tasks.Task;
 
 namespace VSHighlighter.Commands
 {
-	internal sealed class HighlightGold
+	internal sealed class HighlightTurquoise
 	{
 		private readonly AsyncPackage package;
 
-		private HighlightGold(AsyncPackage package, OleMenuCommandService commandService)
+		private HighlightTurquoise(AsyncPackage package, OleMenuCommandService commandService)
 		{
 			this.package = package ?? throw new ArgumentNullException(nameof(package));
 			commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-			var menuCommandID = new CommandID(PackageGuids.guidVSHighlighterPackageCmdSet, PackageIds.HighlightGoldId);
+			var menuCommandID = new CommandID(PackageGuids.guidVSHighlighterPackageCmdSet, PackageIds.HighlightTurquoiseId);
 			var menuItem = new MenuCommand(this.Execute, menuCommandID);
 			commandService.AddCommand(menuItem);
 		}
 
-		public static HighlightGold Instance { get; private set; }
+		public static HighlightTurquoise Instance { get; private set; }
 
 		private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
 
@@ -30,14 +30,14 @@ namespace VSHighlighter.Commands
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
 			OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-			Instance = new HighlightGold(package, commandService);
+			Instance = new HighlightTurquoise(package, commandService);
 		}
 
 		private void Execute(object sender, EventArgs e)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-			string title = "HighlightGold";
+			string title = "HighlightTurquoise";
 
 			// Show a message box to prove we were here
 			VsShellUtilities.ShowMessageBox(

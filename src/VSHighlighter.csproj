@@ -49,6 +49,8 @@
     <Compile Include="AnalyticsConfig.cs" />
     <Compile Include="Commands\HighlightFuchsia.cs" />
     <Compile Include="Commands\HighlightGold.cs" />
+    <Compile Include="Commands\HighlightLime.cs" />
+    <Compile Include="Commands\HighlightTurquoise.cs" />
     <Compile Include="Highlight.cs" />
     <Compile Include="HighlightColor.cs" />
     <Compile Include="HighlightColorsExtensions.cs" />

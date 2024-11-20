@@ -18,9 +18,7 @@ public sealed class VSHighlighterPackage : AsyncPackage
 {
 	public static AsyncPackage Instance;
 
-	// TODO: Add buttons for each color
-	// TODO: add menu options to highlight selection
-	// TODO: add menu options to clear all highlights in the document
+	// TODO: add menu option to clear all highlights in the document
 
 	protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 	{
@@ -30,6 +28,8 @@ public sealed class VSHighlighterPackage : AsyncPackage
 
 		await HighlightFuchsia.InitializeAsync(this);
 		await HighlightGold.InitializeAsync(this);
+		await HighlightTurquoise.InitializeAsync(this);
+		await HighlightLime.InitializeAsync(this);
 
 		await TrackBasicUsageAnalyticsAsync();
 	}

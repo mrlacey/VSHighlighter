@@ -35,6 +35,8 @@ namespace VSHighlighter
         public const int MyMenuGroup = 0x1020;
         public const int HighlightFuchsiaId = 0x0200;
         public const int HighlightGoldId = 0x0300;
+        public const int HighlightTurquoiseId = 0x0400;
+        public const int HighlightLimeId = 0x0500;
         public const int Toolbar = 0x1000;
         public const int ToolbarGroup = 0x1050;
         public const int CodeContextGroup = 0x1100;
