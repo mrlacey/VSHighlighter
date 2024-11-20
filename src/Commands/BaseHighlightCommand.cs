@@ -45,7 +45,7 @@ internal class BaseHighlightCommand
 
 						var selection = wpftextView.Selection;
 
-						// TODO: review handling of multiple selections
+						// TODO: review handling of multiple selections - consider if requested and have a good idea how.
 						var selectionSpan = selection.SelectedSpans[0];
 
 						if (selectionSpan.Length < 1)
@@ -64,6 +64,7 @@ internal class BaseHighlightCommand
 							HighlighterService.Instance.AddHighlight(filePath, this.Color, selectionSpan.Start.Position, selectionSpan.Length);
 
 							// TODO: review including the text of the selection in the highlight record
+							// - is it worth the effort? What if selection no longer matches?
 							//textView.GetSelectedText(out var selText);
 						}
 						else
