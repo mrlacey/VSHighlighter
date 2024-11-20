@@ -11,7 +11,7 @@ internal sealed class HighlightTurquoise : BaseHighlightCommand
 {
 	private HighlightTurquoise(AsyncPackage package, OleMenuCommandService commandService)
 	{
-		this.Color = HighlightColor.Turquoise;
+		this.Color = HighlightColor.DarkTurquoise;
 		this.package = package ?? throw new ArgumentNullException(nameof(package));
 		commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
