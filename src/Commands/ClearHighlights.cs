@@ -68,7 +68,7 @@ internal sealed class ClearHighlights : BaseHighlightCommand
 
 							if (filePath is not null)
 							{
-								HighlighterService.Instance.RemoveAll(filePath);
+								await HighlighterService.Instance.RemoveAllAsync(filePath);
 							}
 							else
 							{

@@ -61,7 +61,7 @@ internal class BaseHighlightCommand
 						{
 							string filePath = textDocument.FilePath;
 
-							HighlighterService.Instance.AddHighlight(filePath, this.Color, selectionSpan.Start.Position, selectionSpan.Length);
+							await HighlighterService.Instance.AddHighlightAsync(filePath, this.Color, selectionSpan.Start.Position, selectionSpan.Length);
 
 							// TODO: review including the text of the selection in the highlight record
 							// - is it worth the effort? What if selection no longer matches?

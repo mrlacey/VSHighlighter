@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace VSHighlighter;
 
@@ -9,6 +13,8 @@ internal class HighlighterService
 
 	private static HighlighterService instance;
 	public static HighlighterService Instance => instance ??= new HighlighterService();
+
+	private string filePath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "vshighlighter.data");
 
 	public HighlighterService()
 	{
@@ -31,6 +37,19 @@ internal class HighlighterService
 		});
 	}
 
+	private async Task SaveAsync()
+	{
+		try
+		{
+			string jsonString = JsonConvert.SerializeObject(highlights);
+			File.WriteAllText(filePath, jsonString);
+		}
+		catch (Exception ex)
+		{
+			await OutputPane.Instance.WriteAsync($"Error saving highlights: {ex.Message}");
+		}
+	}
+
 	internal IEnumerable<Highlight> GetHighlights(string fileName)
 	{
 		foreach (var item in highlights)
@@ -42,7 +61,7 @@ internal class HighlighterService
 		}
 	}
 
-	internal void AddHighlight(string filePath, HighlightColor color, int start, int length)
+	internal async Task AddHighlightAsync(string filePath, HighlightColor color, int start, int length)
 	{
 		var newHighlight = new Highlight
 		{
@@ -58,6 +77,8 @@ internal class HighlighterService
 		highlights.Add(newHighlight);
 
 		Messenger.RequestReloadHighlights();
+
+		await  SaveAsync();
 	}
 
 	internal async Task RemoveHighlightAsync(string id)
@@ -83,9 +104,11 @@ internal class HighlighterService
 		}
 
 		Messenger.RequestReloadHighlights();
+
+		await SaveAsync();
 	}
 
-	internal void RemoveAll(string filePath)
+	internal async Task RemoveAllAsync(string filePath)
 	{
 		System.Diagnostics.Debug.WriteLine($"Removing all highlights from '{filePath}'");
 
@@ -101,5 +124,7 @@ internal class HighlighterService
 		}
 
 		Messenger.RequestReloadHighlights();
+
+		await SaveAsync();
 	}
 }
