@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
+using VSHighlighter;
 
 namespace VSHighlighter.Visuals;
 
@@ -19,10 +21,15 @@ internal class MarginTagger : ITagger<MarginTag>
 		this.docFactory = docFactory;
 		this.textBuffer = textBuffer;
 
-		Messenger.ReloadHighlights += OnReloadHighlightsRequested;
+		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
 	}
 
-	private void OnReloadHighlightsRequested()
+	~MarginTagger()
+	{
+		WeakReferenceMessenger.Default.UnregisterAll(this);
+	}
+
+	private void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
 	{
 		if (textBuffer.CurrentSnapshot != null)
 		{

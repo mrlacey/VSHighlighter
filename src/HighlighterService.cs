@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Messaging;
 using Newtonsoft.Json;
 
 namespace VSHighlighter;
@@ -70,9 +71,9 @@ internal class HighlighterService
 
 		highlights.Add(newHighlight);
 
-		Messenger.RequestReloadHighlights();
+		WeakReferenceMessenger.Default.Send<RequestReloadHighlights>(new RequestReloadHighlights());
 
-		await  SaveAsync();
+		await SaveAsync();
 	}
 
 	internal async Task RemoveHighlightAsync(string id)
@@ -97,7 +98,7 @@ internal class HighlighterService
 			await OutputPane.Instance.WriteAsync($"Failed to remove highlight '{id}'. Collection contained {highlights.Count} items.");
 		}
 
-		Messenger.RequestReloadHighlights();
+		WeakReferenceMessenger.Default.Send(new RequestReloadHighlights());
 
 		await SaveAsync();
 	}
@@ -117,7 +118,7 @@ internal class HighlighterService
 			}
 		}
 
-		Messenger.RequestReloadHighlights();
+		WeakReferenceMessenger.Default.Send(new RequestReloadHighlights());
 
 		await SaveAsync();
 	}

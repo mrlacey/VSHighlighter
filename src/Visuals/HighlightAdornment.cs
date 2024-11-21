@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -35,7 +36,7 @@ internal sealed class HighlightAdornment
 		this.docFactory = docFactory;
 		this.view.LayoutChanged += this.OnLayoutChanged;
 
-		Messenger.ReloadHighlights += OnReloadHighlightsRequested;
+		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
 
 		// Use semi-opaque to not hide underlying text
 		byte fiftyPercent = 255 / 2;
@@ -58,8 +59,13 @@ internal sealed class HighlightAdornment
 		this.pen.Freeze();
 	}
 
+	~HighlightAdornment()
+	{
+		WeakReferenceMessenger.Default.UnregisterAll(this);
+	}
+
 #pragma warning disable VSTHRD100 // Avoid async void methods
-	private async void OnReloadHighlightsRequested()
+	private async void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
 #pragma warning restore VSTHRD100 // Avoid async void methods
 	{
 		await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
