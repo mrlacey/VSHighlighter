@@ -89,7 +89,6 @@ internal sealed class HighlightAdornment
 			await OutputPane.Instance.WriteAsync(exc.StackTrace);
 			await OutputPane.Instance.ActivateAsync();
 		}
-
 	}
 
 	/// <summary>
