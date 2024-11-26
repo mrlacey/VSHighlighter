@@ -10,26 +10,26 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace VSHighlighter.Commands;
 
-internal sealed class ClearHighlights : BaseHighlightCommand
+internal sealed class ClearAllHighlights : BaseHighlightCommand
 {
-	private ClearHighlights(AsyncPackage package, OleMenuCommandService commandService)
+	private ClearAllHighlights(AsyncPackage package, OleMenuCommandService commandService)
 	{
 		this.package = package ?? throw new ArgumentNullException(nameof(package));
 		commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-		var menuCommandID = new CommandID(PackageGuids.guidVSHighlighterPackageCmdSet, PackageIds.ClearHighlightsId);
+		var menuCommandID = new CommandID(PackageGuids.guidVSHighlighterPackageCmdSet, PackageIds.ClearAllHighlightsId);
 		var menuItem = new MenuCommand(this.Execute, menuCommandID);
 		commandService.AddCommand(menuItem);
 	}
 
-	public static ClearHighlights Instance { get; private set; }
+	public static ClearAllHighlights Instance { get; private set; }
 
 	public static async Task InitializeAsync(AsyncPackage package)
 	{
 		await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
 		OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-		Instance = new ClearHighlights(package, commandService);
+		Instance = new ClearAllHighlights(package, commandService);
 	}
 
 #pragma warning disable VSTHRD100 // Avoid async void methods
@@ -41,7 +41,7 @@ internal sealed class ClearHighlights : BaseHighlightCommand
 			if (!(await this.ServiceProvider.GetServiceAsync(typeof(SVsTextManager)) is IVsTextManager textManager))
 			{
 				// If we fail to get the text manager, we can't get the active view.
-				await OutputPane.Instance.WriteAsync("Unable to clear highlights: failed to get the text manager.");
+				await OutputPane.Instance.WriteAsync("Unable to clear all highlights: failed to get the text manager.");
 			}
 			else
 			{
@@ -50,7 +50,7 @@ internal sealed class ClearHighlights : BaseHighlightCommand
 				if (textView == null)
 				{
 					// If we fail to get the active view, we can't get the WPF view.
-					await OutputPane.Instance.WriteAsync("Unable to clear highlights: failed to get the text view.");
+					await OutputPane.Instance.WriteAsync("Unable to clear all highlights: failed to get the text view.");
 				}
 				else
 				{
@@ -72,24 +72,26 @@ internal sealed class ClearHighlights : BaseHighlightCommand
 							}
 							else
 							{
-								await OutputPane.Instance.WriteAsync("Unable to clear highlights: file path was unknown.");
+								await OutputPane.Instance.WriteAsync("Unable to clear all highlights: file path was unknown.");
 							}
 						}
 						else
 						{
-							await OutputPane.Instance.WriteAsync("Unable to clear highlights: failed to get the path of the file.");
+							await OutputPane.Instance.WriteAsync("Unable to clear all highlights: failed to get the path of the file.");
 						}
 					}
 					else
 					{
-						await OutputPane.Instance.WriteAsync("Unable to clear highlights: failed to get the editor adapter.");
+						await OutputPane.Instance.WriteAsync("Unable to clear all highlights: failed to get the editor adapter.");
 					}
 				}
 			}
 		}
 		catch (Exception exc)
 		{
-			await OutputPane.Instance.WriteAsync("Error clear highlights: " + exc.Message);
+			await OutputPane.Instance.WriteAsync("Error in clear all highlights: " + exc.Message);
+			await OutputPane.Instance.WriteAsync(exc.StackTrace);
+			await OutputPane.Instance.ActivateAsync();
 		}
 
 	}

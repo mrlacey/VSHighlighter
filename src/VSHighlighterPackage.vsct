@@ -44,10 +44,10 @@
 					<LocCanonicalName>.HighlightSelection.Lime</LocCanonicalName>
 				</Strings>
 			</Button>
-			<Button guid="guidVSHighlighterPackageCmdSet" id="ClearHighlightsId" priority="0x0100" type="Button">
+			<Button guid="guidVSHighlighterPackageCmdSet" id="ClearAllHighlightsId" priority="0x0100" type="Button">
 				<Strings>
-					<ButtonText>Clear all in document</ButtonText>
-					<LocCanonicalName>.HighlightSelection.Clear</LocCanonicalName>
+					<ButtonText>Clear All in document</ButtonText>
+					<LocCanonicalName>.HighlightSelection.ClearAll</LocCanonicalName>
 				</Strings>
 			</Button>
 		</Buttons>
@@ -113,7 +113,7 @@
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightLimeId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="ClearHighlightsId" priority="0x0600">
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="ClearAllHighlightsId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
 
@@ -145,7 +145,7 @@
 			<IDSymbol name="HighlightGoldId" value="0x0300" />
 			<IDSymbol name="HighlightTurquoiseId" value="0x0400" />
 			<IDSymbol name="HighlightLimeId" value="0x0500" />
-			<IDSymbol name="ClearHighlightsId" value="0x0600" />
+			<IDSymbol name="ClearAllHighlightsId" value="0x0600" />
 
 			<IDSymbol name="Toolbar" value="0x1000" />
 			<IDSymbol name="ToolbarGroup" value="0x1050" />
