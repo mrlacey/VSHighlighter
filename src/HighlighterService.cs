@@ -75,7 +75,7 @@ internal class HighlighterService
 
 		highlights.Add(newHighlight);
 
-		WeakReferenceMessenger.Default.Send<RequestReloadHighlights>(new RequestReloadHighlights());
+		WeakReferenceMessenger.Default.Send<RequestReloadHighlights>(new RequestReloadHighlights(start, length));
 
 		await SaveAsync();
 	}
@@ -84,12 +84,18 @@ internal class HighlighterService
 	{
 		var itemRemoved = false;
 
+		int removalStart = -1;
+		int removalLength = -1;
+
 		foreach (var item in highlights)
 		{
 			if (item.Id == id)
 			{
 				// TODO: need to track details of what's been removed so it can be passed via the messenger (Issue#1)
 				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
+
+				removalStart = item.SpanStart;
+				removalLength = item.SpanLength;
 
 				highlights.Remove(item);
 				itemRemoved = true;
@@ -101,10 +107,12 @@ internal class HighlighterService
 		{
 			await OutputPane.Instance.WriteAsync($"Failed to remove highlight '{id}'. Collection contained {highlights.Count} items.");
 		}
+		else
+		{
+			WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(removalStart, removalLength));
 
-		WeakReferenceMessenger.Default.Send(new RequestReloadHighlights());
-
-		await SaveAsync();
+			await SaveAsync();
+		}
 	}
 
 	internal async Task RemoveAllAsync(string filePath)

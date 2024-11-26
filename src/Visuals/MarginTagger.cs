@@ -33,7 +33,11 @@ internal class MarginTagger : ITagger<MarginTag>
 		if (textBuffer.CurrentSnapshot != null)
 		{
 			var snapshot = textBuffer.CurrentSnapshot;
-			var span = new SnapshotSpan(snapshot, 0, snapshot.Length);
+
+			var span = msg.WholeDocument
+				? new SnapshotSpan(snapshot, 0, snapshot.Length)
+				: new SnapshotSpan(snapshot, msg.RangeStart, msg.RangeLength);
+
 			TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
 		}
 	}

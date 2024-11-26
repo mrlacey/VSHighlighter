@@ -72,11 +72,11 @@ internal sealed class HighlightAdornment
 		{
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			// Get the span of the entire document
-			var entireSpan = new SnapshotSpan(this.view.TextSnapshot, 0, this.view.TextSnapshot.Length);
+			var span = msg.WholeDocument
+				? new SnapshotSpan(this.view.TextSnapshot, 0, this.view.TextSnapshot.Length)
+				: new SnapshotSpan(this.view.TextSnapshot, msg.RangeStart, msg.RangeLength);
 
-			// Get all the lines in the document
-			var textViewLines = this.view.TextViewLines.GetTextViewLinesIntersectingSpan(entireSpan);
+			var textViewLines = this.view.TextViewLines.GetTextViewLinesIntersectingSpan(span);
 
 			foreach (var line in textViewLines)
 			{
