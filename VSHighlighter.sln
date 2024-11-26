@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSHighlighter.Tests", "VSHighlighter.Tests\VSHighlighter.Tests.csproj", "{49FA3015-E962-4A15-94D5-E5E8FDA2CF3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSHighlighter.Tests", "src\VSHighlighter.Tests\VSHighlighter.Tests.csproj", "{49FA3015-E962-4A15-94D5-E5E8FDA2CF3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

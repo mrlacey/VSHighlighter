@@ -59,7 +59,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\VSHighlighter.csproj">
+    <ProjectReference Include="..\VSHighlighter.csproj">
       <Project>{6783d9e1-dd49-4a6e-9fa3-6957042dcabe}</Project>
       <Name>VSHighlighter</Name>
     </ProjectReference>
