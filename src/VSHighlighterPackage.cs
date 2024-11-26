@@ -66,6 +66,7 @@ public sealed class VSHighlighterPackage : AsyncPackage
 		{
 			System.Diagnostics.Debug.WriteLine(exc);
 			await OutputPane.Instance.WriteAsync("Error tracking usage analytics: " + exc.Message);
+			await OutputPane.Instance.WriteAsync(exc.StackTrace);
 		}
 	}
 

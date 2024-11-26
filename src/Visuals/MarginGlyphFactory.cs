@@ -45,6 +45,8 @@ internal class MarginGlyphFactory : IGlyphFactory
 		catch (System.Exception exc)
 		{
 			await OutputPane.Instance.WriteAsync(exc.Message);
+			await OutputPane.Instance.WriteAsync(exc.StackTrace);
+			await OutputPane.Instance.ActivateAsync();
 		}
 	}
 }

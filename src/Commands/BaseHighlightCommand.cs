@@ -82,6 +82,8 @@ internal class BaseHighlightCommand
 		catch (Exception exc)
 		{
 			await OutputPane.Instance.WriteAsync("Error highlighting text: " + exc.Message);
+			await OutputPane.Instance.WriteAsync(exc.StackTrace);
+			await OutputPane.Instance.ActivateAsync();
 		}
 	}
 }
