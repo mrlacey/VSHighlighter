@@ -91,7 +91,6 @@ internal class HighlighterService
 		{
 			if (item.Id == id)
 			{
-				// TODO: need to track details of what's been removed so it can be passed via the messenger (Issue#1)
 				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
 
 				removalStart = item.SpanStart;
