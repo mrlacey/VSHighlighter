@@ -50,6 +50,13 @@
 					<LocCanonicalName>.HighlightSelection.ClearAll</LocCanonicalName>
 				</Strings>
 			</Button>
+			<Button guid="guidVSHighlighterPackageCmdSet" id="ClearHighlightId" priority="0x0100" type="Button">
+				<Icon guid="guidImages" id="bmpCross" />
+				<Strings>
+					<ButtonText>Clear highlight</ButtonText>
+					<LocCanonicalName>.HighlightSelection.Clear</LocCanonicalName>
+				</Strings>
+			</Button>
 		</Buttons>
 
 		<Menus>
@@ -68,7 +75,7 @@
 		</Menus>
 
 		<Bitmaps>
-			<Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpTurquoise, bmpFuchsia, bmpGold, bmpLime, bmpPicArrows, bmpPicStrikethrough"/>
+			<Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpTurquoise, bmpFuchsia, bmpGold, bmpLime, bmpCross, bmpPicStrikethrough"/>
 		</Bitmaps>
 	</Commands>
 
@@ -113,7 +120,10 @@
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightLimeId" priority="0x0600">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="ClearAllHighlightsId" priority="0x0600">
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="ClearHighlightId" priority="0x0700">
+			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="ClearAllHighlightsId" priority="0x0800">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="MyMenuGroup" />
 		</CommandPlacement>
 
@@ -128,6 +138,9 @@
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="ToolbarGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="HighlightLimeId" priority="0x0600">
+			<Parent guid="guidVSHighlighterPackageCmdSet" id="ToolbarGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="guidVSHighlighterPackageCmdSet" id="ClearHighlightId" priority="0x0700">
 			<Parent guid="guidVSHighlighterPackageCmdSet" id="ToolbarGroup" />
 		</CommandPlacement>
 
@@ -146,6 +159,7 @@
 			<IDSymbol name="HighlightTurquoiseId" value="0x0400" />
 			<IDSymbol name="HighlightLimeId" value="0x0500" />
 			<IDSymbol name="ClearAllHighlightsId" value="0x0600" />
+			<IDSymbol name="ClearHighlightId" value="0x0700" />
 
 			<IDSymbol name="Toolbar" value="0x1000" />
 			<IDSymbol name="ToolbarGroup" value="0x1050" />
@@ -159,7 +173,7 @@
 			<IDSymbol name="bmpFuchsia" value="2" />
 			<IDSymbol name="bmpGold" value="3" />
 			<IDSymbol name="bmpLime" value="4" />
-			<IDSymbol name="bmpPicArrows" value="5" />
+			<IDSymbol name="bmpCross" value="5" />
 			<IDSymbol name="bmpPicStrikethrough" value="6" />
 		</GuidSymbol>
 

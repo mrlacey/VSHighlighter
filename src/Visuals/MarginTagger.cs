@@ -9,7 +9,7 @@ namespace VSHighlighter.Visuals;
 internal class MarginTagger : ITagger<MarginTag>
 {
 	private readonly ITextDocumentFactoryService docFactory;
-	private ITextBuffer textBuffer;
+	private readonly ITextBuffer textBuffer;
 
 #pragma warning disable 67 // unused event - but required by interface
 	public event EventHandler<SnapshotSpanEventArgs> TagsChanged;

@@ -41,23 +41,23 @@ internal class BaseHighlightCommand
 					{
 						var provider = componentModel.GetService<IVsEditorAdaptersFactoryService>();
 
-						var wpftextView = provider.GetWpfTextView(textView);
+						var wpfTextView = provider.GetWpfTextView(textView);
 
-						var selection = wpftextView.Selection;
+						var selection = wpfTextView.Selection;
 
 						// TODO: review handling of multiple selections - consider if requested and have a good idea how.
 						var selectionSpan = selection.SelectedSpans[0];
 
 						if (selectionSpan.Length < 1)
 						{
-							var caretPosition = wpftextView.Caret.Position.BufferPosition;
-							var textViewLine = wpftextView.TextViewLines.GetTextViewLineContainingBufferPosition(caretPosition);
+							var caretPosition = wpfTextView.Caret.Position.BufferPosition;
+							var textViewLine = wpfTextView.TextViewLines.GetTextViewLineContainingBufferPosition(caretPosition);
 							selectionSpan = new SnapshotSpan(textViewLine.Start, textViewLine.End);
 						}
 
 						// Get the file path of the document
 						var textDocumentFactoryService = componentModel.GetService<ITextDocumentFactoryService>();
-						if (textDocumentFactoryService.TryGetTextDocument(wpftextView.TextDataModel.DocumentBuffer, out ITextDocument textDocument))
+						if (textDocumentFactoryService.TryGetTextDocument(wpfTextView.TextDataModel.DocumentBuffer, out ITextDocument textDocument))
 						{
 							string filePath = textDocument.FilePath;
 

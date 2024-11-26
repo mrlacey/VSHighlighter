@@ -31,6 +31,7 @@ public sealed class VSHighlighterPackage : AsyncPackage
 		await HighlightGold.InitializeAsync(this);
 		await HighlightTurquoise.InitializeAsync(this);
 		await HighlightLime.InitializeAsync(this);
+		await ClearHighlight.InitializeAsync(this);
 		await ClearAllHighlights.InitializeAsync(this);
 
 		await TrackBasicUsageAnalyticsAsync();

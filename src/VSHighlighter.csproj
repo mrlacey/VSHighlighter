@@ -48,6 +48,7 @@
     <Compile Include="AnalyticsConfig.cs" />
     <Compile Include="Commands\BaseHighlightCommand.cs" />
     <Compile Include="Commands\ClearAllHighlights.cs" />
+    <Compile Include="Commands\ClearHighlight.cs" />
     <Compile Include="Commands\HighlightFuchsia.cs" />
     <Compile Include="Commands\HighlightGold.cs" />
     <Compile Include="Commands\HighlightLime.cs" />

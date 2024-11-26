@@ -9,12 +9,12 @@ namespace VSHighlighter;
 
 internal class HighlighterService
 {
-	private List<Highlight> highlights = new();
+	private List<Highlight> highlights = [];
 
 	private static HighlighterService instance;
 	public static HighlighterService Instance => instance ??= new HighlighterService();
 
-	private string filePath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "vshighlighter.data");
+	private readonly string filePath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "vshighlighter.data");
 
 	public HighlighterService()
 	{
@@ -105,6 +105,42 @@ internal class HighlighterService
 		if (!itemRemoved)
 		{
 			await OutputPane.Instance.WriteAsync($"Failed to remove highlight '{id}'. Collection contained {highlights.Count} items.");
+		}
+		else
+		{
+			WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(removalStart, removalLength));
+
+			await SaveAsync();
+		}
+	}
+
+	internal async Task RemoveHighlightsInRangeAsync(string filePath, int start, int length)
+	{
+		var itemRemoved = false;
+
+		int removalStart = -1;
+		int removalLength = -1;
+
+		for (int i = highlights.Count - 1; i >= 0; i--)
+		{
+			Highlight item = highlights[i];
+
+			if (item.FilePath == filePath & item.Intersects(start, length))
+			{
+				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
+
+				removalStart = item.SpanStart;
+				removalLength = item.SpanLength;
+
+				highlights.Remove(item);
+				itemRemoved = true;
+				break;
+			}
+		}
+
+		if (!itemRemoved)
+		{
+			await OutputPane.Instance.WriteAsync($"Failed to remove highlight from '{filePath}' in range '{start}>{length}'. Collection contained {highlights.Count} items.");
 		}
 		else
 		{

@@ -38,6 +38,7 @@ namespace VSHighlighter
         public const int HighlightTurquoiseId = 0x0400;
         public const int HighlightLimeId = 0x0500;
         public const int ClearAllHighlightsId = 0x0600;
+        public const int ClearHighlightId = 0x0700;
         public const int Toolbar = 0x1000;
         public const int ToolbarGroup = 0x1050;
         public const int CodeContextGroup = 0x1100;
@@ -46,7 +47,7 @@ namespace VSHighlighter
         public const int bmpFuchsia = 0x0002;
         public const int bmpGold = 0x0003;
         public const int bmpLime = 0x0004;
-        public const int bmpPicArrows = 0x0005;
+        public const int bmpCross = 0x0005;
         public const int bmpPicStrikethrough = 0x0006;
         public const int IDVisualStudioXAMLWindowContextMenu = 0x0103;
     }
