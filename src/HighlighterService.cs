@@ -129,18 +129,32 @@ internal class HighlighterService
 			{
 				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
 
-				removalStart = item.SpanStart;
-				removalLength = item.SpanLength;
+				if (item.SpanStart < removalStart || removalStart == -1)
+				{
+					if (removalStart == -1)
+					{
+						removalLength = item.SpanLength;
+					}
+					else
+					{
+						removalLength += removalStart - item.SpanStart;
+					}
+
+					removalStart = item.SpanStart;
+				}
+				else if (removalStart != 1)
+				{
+					removalLength = removalStart + (item.SpanStart - removalStart) + item.SpanLength;
+				}
 
 				highlights.Remove(item);
 				itemRemoved = true;
-				break;
 			}
 		}
 
 		if (!itemRemoved)
 		{
-			await OutputPane.Instance.WriteAsync($"Failed to remove highlight from '{filePath}' in range '{start}>{length}'. Collection contained {highlights.Count} items.");
+			await OutputPane.Instance.WriteAsync($"Failed to remove highlights from '{filePath}' in range '{start}>{length}'. Collection contained {highlights.Count} items.");
 		}
 		else
 		{
