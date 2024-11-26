@@ -68,18 +68,28 @@ internal sealed class HighlightAdornment
 	private async void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
 #pragma warning restore VSTHRD100 // Avoid async void methods
 	{
-		await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-		// Get the span of the entire document
-		var entireSpan = new SnapshotSpan(this.view.TextSnapshot, 0, this.view.TextSnapshot.Length);
-
-		// Get all the lines in the document
-		var textViewLines = this.view.TextViewLines.GetTextViewLinesIntersectingSpan(entireSpan);
-
-		foreach (var line in textViewLines)
+		try
 		{
-			this.CreateVisuals(line);
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+			// Get the span of the entire document
+			var entireSpan = new SnapshotSpan(this.view.TextSnapshot, 0, this.view.TextSnapshot.Length);
+
+			// Get all the lines in the document
+			var textViewLines = this.view.TextViewLines.GetTextViewLinesIntersectingSpan(entireSpan);
+
+			foreach (var line in textViewLines)
+			{
+				this.CreateVisuals(line);
+			}
 		}
+		catch (Exception exc)
+		{
+			await OutputPane.Instance.WriteAsync($"Error reloading highlights: {exc.Message}");
+			await OutputPane.Instance.WriteAsync(exc.StackTrace);
+			await OutputPane.Instance.ActivateAsync();
+		}
+
 	}
 
 	/// <summary>
@@ -91,11 +101,22 @@ internal sealed class HighlightAdornment
 	/// </remarks>
 	/// <param name="sender">The event sender.</param>
 	/// <param name="e">The event arguments.</param>
-	internal void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
+#pragma warning disable VSTHRD100 // Avoid async void methods
+	internal async void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
 	{
-		foreach (ITextViewLine line in e.NewOrReformattedLines)
+		try
 		{
-			this.CreateVisuals(line);
+			foreach (ITextViewLine line in e.NewOrReformattedLines)
+			{
+				this.CreateVisuals(line);
+			}
+		}
+		catch (Exception exc)
+		{
+			await OutputPane.Instance.WriteAsync($"Error handling layout changed: {exc.Message}");
+			await OutputPane.Instance.WriteAsync(exc.StackTrace);
+			await OutputPane.Instance.ActivateAsync();
 		}
 	}
 
@@ -111,6 +132,13 @@ internal sealed class HighlightAdornment
 
 			foreach (var highlight in highlights)
 			{
+				var len = line.Snapshot.Length;
+
+				if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
+				{
+					continue;
+				}
+
 				var highlightSpan = new SnapshotSpan(line.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
 
 				if (highlightSpan.IntersectsWith(lineSpan))

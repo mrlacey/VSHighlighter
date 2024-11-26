@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
-using VSHighlighter;
 
 namespace VSHighlighter.Visuals;
 
@@ -49,7 +48,15 @@ internal class MarginTagger : ITagger<MarginTag>
 
 				foreach (var highlight in highlights)
 				{
+					var len = span.Snapshot.Length;
+
+					if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
+					{
+						continue;
+					}
+
 					var highlightSpan = new SnapshotSpan(span.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
+
 					if (highlightSpan.IntersectsWith(span))
 					{
 						yield return new TagSpan<MarginTag>(highlightSpan, new MarginTag(highlight));

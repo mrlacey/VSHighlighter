@@ -28,6 +28,8 @@ internal class HighlighterService
 			catch (Exception ex)
 			{
 				_ = OutputPane.Instance.WriteAsync($"Error loading highlights: {ex.Message}");
+				_ = OutputPane.Instance.WriteAsync(ex.StackTrace);
+				_ = OutputPane.Instance.ActivateAsync();
 			}
 		}
 	}
@@ -39,9 +41,11 @@ internal class HighlighterService
 			string jsonString = JsonConvert.SerializeObject(highlights);
 			File.WriteAllText(filePath, jsonString);
 		}
-		catch (Exception ex)
+		catch (Exception exc)
 		{
-			await OutputPane.Instance.WriteAsync($"Error saving highlights: {ex.Message}");
+			await OutputPane.Instance.WriteAsync($"Error saving highlights: {exc.Message}");
+			await OutputPane.Instance.WriteAsync(exc.StackTrace);
+			await OutputPane.Instance.ActivateAsync();
 		}
 	}
 
