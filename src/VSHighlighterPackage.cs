@@ -42,25 +42,26 @@ public sealed class VSHighlighterPackage : AsyncPackage
 		try
 		{
 #if !DEBUG
-		if (string.IsNullOrWhiteSpace(AnalyticsConfig.TelemetryConnectionString))
-		{
-			return;
-		}
+			if (string.IsNullOrWhiteSpace(AnalyticsConfig.TelemetryConnectionString))
+			{
+				return;
+			}
 
-		var config = new TelemetryConfiguration
-		{
-			ConnectionString = AnalyticsConfig.TelemetryConnectionString,
-		};
+			var config = new TelemetryConfiguration
+			{
+				ConnectionString = AnalyticsConfig.TelemetryConnectionString,
+			};
 
-		var client = new TelemetryClient(config);
+			var client = new TelemetryClient(config);
 
-		var properties = new Dictionary<string, string>
+			var properties = new Dictionary<string, string>
 			{
 				{ "VsixVersion", Vsix.Version },
 				{ "VsVersion", Microsoft.VisualStudio.Telemetry.TelemetryService.DefaultSession?.GetSharedProperty("VS.Core.ExeVersion") },
+				{ "Architecture", RuntimeInformation.ProcessArchitecture.ToString() },
 			};
 
-		client.TrackEvent(Vsix.Name, properties);
+			client.TrackEvent(Vsix.Name, properties);
 #endif
 		}
 		catch (Exception exc)
