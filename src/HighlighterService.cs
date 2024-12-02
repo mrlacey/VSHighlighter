@@ -14,15 +14,15 @@ internal class HighlighterService
 	private static HighlighterService instance;
 	public static HighlighterService Instance => instance ??= new HighlighterService();
 
-	private readonly string filePath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "vshighlighter.data");
+	private readonly string persistedFilePath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "vshighlighter.data");
 
 	public HighlighterService()
 	{
-		if (File.Exists(filePath))
+		if (File.Exists(persistedFilePath))
 		{
 			try
 			{
-				string jsonString = File.ReadAllText(filePath);
+				string jsonString = File.ReadAllText(persistedFilePath);
 				highlights = JsonConvert.DeserializeObject<List<Highlight>>(jsonString);
 			}
 			catch (Exception ex)
@@ -39,7 +39,7 @@ internal class HighlighterService
 		try
 		{
 			string jsonString = JsonConvert.SerializeObject(highlights);
-			File.WriteAllText(filePath, jsonString);
+			File.WriteAllText(persistedFilePath, jsonString);
 		}
 		catch (Exception exc)
 		{
@@ -60,11 +60,12 @@ internal class HighlighterService
 		}
 	}
 
-	internal async Task AddHighlightAsync(string filePath, HighlightColor color, int start, int length)
+	internal async Task AddHighlightAsync(string filePath, HighlightColor color, int lineNo, int start, int length)
 	{
 		var newHighlight = new Highlight
 		{
 			FilePath = filePath,
+			LineNumber = lineNo,
 			SpanStart = start,
 			SpanLength = length,
 			Color = color,
@@ -75,7 +76,7 @@ internal class HighlighterService
 
 		highlights.Add(newHighlight);
 
-		WeakReferenceMessenger.Default.Send<RequestReloadHighlights>(new RequestReloadHighlights(start, length));
+		WeakReferenceMessenger.Default.Send<RequestReloadHighlights>(new RequestReloadHighlights(filePath, start, length));
 
 		await SaveAsync();
 	}
@@ -86,6 +87,7 @@ internal class HighlighterService
 
 		int removalStart = -1;
 		int removalLength = -1;
+		string removalFilePath = string.Empty;
 
 		foreach (var item in highlights)
 		{
@@ -108,7 +110,7 @@ internal class HighlighterService
 		}
 		else
 		{
-			WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(removalStart, removalLength));
+			WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(removalFilePath, removalStart, removalLength));
 
 			await SaveAsync();
 		}
@@ -158,7 +160,7 @@ internal class HighlighterService
 		}
 		else
 		{
-			WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(removalStart, removalLength));
+			WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(filePath, removalStart, removalLength));
 
 			await SaveAsync();
 		}
@@ -179,7 +181,7 @@ internal class HighlighterService
 			}
 		}
 
-		WeakReferenceMessenger.Default.Send(new RequestReloadHighlights());
+		WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(filePath));
 
 		await SaveAsync();
 	}

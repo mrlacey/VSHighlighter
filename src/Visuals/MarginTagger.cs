@@ -10,6 +10,7 @@ internal class MarginTagger : ITagger<MarginTag>
 {
 	private readonly ITextDocumentFactoryService docFactory;
 	private readonly ITextBuffer textBuffer;
+	private readonly string documentName;
 
 #pragma warning disable 67 // unused event - but required by interface
 	public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
@@ -19,6 +20,11 @@ internal class MarginTagger : ITagger<MarginTag>
 	{
 		this.docFactory = docFactory;
 		this.textBuffer = textBuffer;
+
+		if (docFactory.TryGetTextDocument(textBuffer, out ITextDocument document))
+		{
+			documentName = document.FilePath;
+		}
 
 		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
 	}
@@ -30,7 +36,7 @@ internal class MarginTagger : ITagger<MarginTag>
 
 	private void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
 	{
-		if (textBuffer.CurrentSnapshot != null)
+		if (textBuffer.CurrentSnapshot != null && msg.FileName == this.documentName)
 		{
 			var snapshot = textBuffer.CurrentSnapshot;
 
@@ -46,25 +52,22 @@ internal class MarginTagger : ITagger<MarginTag>
 	{
 		foreach (SnapshotSpan span in spans)
 		{
-			if (docFactory.TryGetTextDocument(span.Snapshot.TextBuffer, out ITextDocument document))
+			var highlights = HighlighterService.Instance.GetHighlights(this.documentName);
+
+			foreach (var highlight in highlights)
 			{
-				var highlights = HighlighterService.Instance.GetHighlights(document.FilePath);
+				var len = span.Snapshot.Length;
 
-				foreach (var highlight in highlights)
+				if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
 				{
-					var len = span.Snapshot.Length;
+					continue;
+				}
 
-					if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
-					{
-						continue;
-					}
+				var highlightSpan = new SnapshotSpan(span.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
 
-					var highlightSpan = new SnapshotSpan(span.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
-
-					if (highlightSpan.IntersectsWith(span))
-					{
-						yield return new TagSpan<MarginTag>(highlightSpan, new MarginTag(highlight));
-					}
+				if (highlightSpan.IntersectsWith(span))
+				{
+					yield return new TagSpan<MarginTag>(highlightSpan, new MarginTag(highlight));
 				}
 			}
 		}

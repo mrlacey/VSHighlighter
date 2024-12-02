@@ -2,17 +2,21 @@
 
 public class RequestReloadHighlights
 {
-	public RequestReloadHighlights()
+	public RequestReloadHighlights(string fileName)
 	{
+		FileName = fileName;
 		this.WholeDocument = true;
 	}
 
-	public RequestReloadHighlights(int rangeStart, int rangeLength)
+	public RequestReloadHighlights(string fileName, int rangeStart, int rangeLength)
 	{
 		WholeDocument = false;
+		FileName = fileName;
 		RangeStart = rangeStart;
 		RangeLength = rangeLength;
 	}
+
+	public string FileName { get; set; }
 
 	public bool WholeDocument { get; set; }
 

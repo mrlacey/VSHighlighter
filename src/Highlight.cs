@@ -12,6 +12,7 @@ public class Highlight
 	[JsonIgnore]
 	public string Id { get; private set; }
 	public string FilePath { get; set; }
+	public int LineNumber { get; set; } = -1;
 	public int SpanStart { get; set; }
 	public int SpanLength { get; set; }
 	public HighlightColor Color { get; set; }
