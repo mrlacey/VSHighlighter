@@ -72,6 +72,8 @@
     <Compile Include="Visuals\MarginTag.cs" />
     <Compile Include="Visuals\MarginTagger.cs" />
     <Compile Include="Visuals\MarginTaggerProvider.cs" />
+    <Compile Include="Visuals\ScrollBarMargin.cs" />
+    <Compile Include="Visuals\ScrollBarMarginFactory.cs" />
     <Compile Include="VSHighlighterPackage.cs" />
     <Compile Include="VSHighlighterPackage1.cs">
       <AutoGen>True</AutoGen>
