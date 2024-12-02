@@ -74,6 +74,12 @@ internal class HighlighterService
 
 		System.Diagnostics.Debug.WriteLine($"Adding highlight {newHighlight.Id} to {newHighlight.FilePath}");
 
+		if (highlights.Contains(newHighlight))
+		{
+			await OutputPane.Instance.WriteAsync($"Highlight already exists at {newHighlight.FilePath}:{newHighlight.SpanStart}-{newHighlight.SpanLength}");
+			return;
+		}
+
 		highlights.Add(newHighlight);
 
 		WeakReferenceMessenger.Default.Send<RequestReloadHighlights>(new RequestReloadHighlights(filePath, start, length));

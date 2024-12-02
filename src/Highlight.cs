@@ -25,8 +25,26 @@ public class Highlight
 			return false;
 		}
 
-		return (start<= this.SpanStart && start + length >= this.SpanStart)
+		return (start <= this.SpanStart && start + length >= this.SpanStart)
 			|| ((start >= this.SpanStart && start < this.SpanStart + this.SpanLength)
 				|| (start + length >= this.SpanStart && start + length <= this.SpanStart + this.SpanLength));
+	}
+
+	public override bool Equals(object obj)
+	{
+		if (obj is Highlight other)
+		{
+			return
+				FilePath == other.FilePath &&
+				SpanStart == other.SpanStart &&
+				SpanLength == other.SpanLength;
+		}
+
+		return false;
+	}
+
+	public override int GetHashCode()
+	{
+		return new { FilePath, SpanStart, SpanLength }.GetHashCode();
 	}
 }
