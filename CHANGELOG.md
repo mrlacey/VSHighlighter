@@ -1,5 +1,9 @@
 ﻿# VS Highlighter
 
+## 1.3 - Dec 2024
+
+- Ensure highlights are removed from then editor when deleted ("cleared").
+
 ## 1.2 - Nov 2024
 
 - Added support for clearing a single highlight via the toolbar and context menu.
