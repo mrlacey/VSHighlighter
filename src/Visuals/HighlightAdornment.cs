@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.Messaging;
@@ -68,6 +69,8 @@ internal sealed class HighlightAdornment
 	private async void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
 #pragma warning restore VSTHRD100 // Avoid async void methods
 	{
+		System.Diagnostics.Debug.WriteLine("OnLayoutChanged");
+
 		try
 		{
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -104,6 +107,8 @@ internal sealed class HighlightAdornment
 	internal async void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
 #pragma warning restore VSTHRD100 // Avoid async void methods
 	{
+		System.Diagnostics.Debug.WriteLine("OnLayoutChanged");
+
 		try
 		{
 			foreach (ITextViewLine line in e.NewOrReformattedLines)
@@ -127,85 +132,96 @@ internal sealed class HighlightAdornment
 		{
 			var highlights = HighlighterService.Instance.GetHighlights(document.FilePath);
 
+			System.Diagnostics.Debug.WriteLine($"Found {highlights.Count()} highlights in file.");
+
 			var lineSpan = new Span(line.Start, line.Length);
 
-			foreach (var highlight in highlights)
+			if (highlights.Any())
 			{
-				var len = line.Snapshot.Length;
-
-				if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
+				foreach (var highlight in highlights)
 				{
-					continue;
-				}
+					var len = line.Snapshot.Length;
 
-				var highlightSpan = new SnapshotSpan(line.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
-
-				if (highlightSpan.IntersectsWith(lineSpan))
-				{
-					var spanToUse = lineSpan;
-
-					if (highlightSpan.Start < lineSpan.Start)
+					if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
 					{
-						// Highlight starts before the line
+						continue;
+					}
 
-						if (highlightSpan.End > lineSpan.End)
+					var highlightSpan = new SnapshotSpan(line.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
+
+					if (highlightSpan.IntersectsWith(lineSpan))
+					{
+						var spanToUse = lineSpan;
+
+						if (highlightSpan.Start < lineSpan.Start)
 						{
-							// highlight goes longer than the line so highlight the whole line
-							spanToUse = lineSpan;
+							// Highlight starts before the line
+
+							if (highlightSpan.End > lineSpan.End)
+							{
+								// highlight goes longer than the line so highlight the whole line
+								spanToUse = lineSpan;
+							}
+							else
+							{
+								// Only highlight up to the relevant point in the current line
+								spanToUse = new Span(lineSpan.Start, highlightSpan.End - lineSpan.Start);
+							}
 						}
 						else
 						{
-							// Only highlight up to the relevant point in the current line
-							spanToUse = new Span(lineSpan.Start, highlightSpan.End - lineSpan.Start);
+							// Highlight starts in the line
+
+							if (highlightSpan.End > lineSpan.End)
+							{
+								// Highlight goes longer than the line so highlight from the start of the highlight to the end of the line
+								spanToUse = new Span(highlightSpan.Start, lineSpan.End - highlightSpan.Start);
+							}
+							else
+							{
+								// Full highlight is within the line
+								spanToUse = highlightSpan.Span;
+							}
 						}
-					}
-					else
-					{
-						// Highlight starts in the line
 
-						if (highlightSpan.End > lineSpan.End)
+						SnapshotSpan span = new(this.view.TextSnapshot, spanToUse);
+
+						Geometry geometry = textViewLines.GetMarkerGeometry(span);
+						if (geometry != null)
 						{
-							// Highlight goes longer than the line so highlight from the start of the highlight to the end of the line
-							spanToUse = new Span(highlightSpan.Start, lineSpan.End - highlightSpan.Start);
+							var brush = highlight.Color switch
+							{
+								HighlightColor.DarkTurquoise => this.darkTurquoiseBrush,
+								HighlightColor.Fuchsia => this.fuchsiaBrush,
+								HighlightColor.Gold => this.goldBrush,
+								_ => this.limeBrush,
+							};
+
+							var drawing = new GeometryDrawing(brush, this.pen, geometry);
+							drawing.Freeze();
+
+							var drawingImage = new DrawingImage(drawing);
+							drawingImage.Freeze();
+
+							var image = new Image
+							{
+								Source = drawingImage,
+							};
+
+							// Align the image with the top of the bounds of the text geometry
+							Canvas.SetLeft(image, geometry.Bounds.Left);
+							Canvas.SetTop(image, geometry.Bounds.Top);
+
+							System.Diagnostics.Debug.WriteLine($"Adding adornment.");
+
+							this.layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, null, image, null);
 						}
-						else
-						{
-							// Full highlight is within the line
-							spanToUse = highlightSpan.Span;
-						}
-					}
-
-					SnapshotSpan span = new(this.view.TextSnapshot, spanToUse);
-
-					Geometry geometry = textViewLines.GetMarkerGeometry(span);
-					if (geometry != null)
-					{
-						var brush = highlight.Color switch
-						{
-							HighlightColor.DarkTurquoise => this.darkTurquoiseBrush,
-							HighlightColor.Fuchsia => this.fuchsiaBrush,
-							HighlightColor.Gold => this.goldBrush,
-							_ => this.limeBrush,
-						};
-
-						var drawing = new GeometryDrawing(brush, this.pen, geometry);
-						drawing.Freeze();
-
-						var drawingImage = new DrawingImage(drawing);
-						drawingImage.Freeze();
-
-						var image = new Image
-						{
-							Source = drawingImage,
-						};
-
-						// Align the image with the top of the bounds of the text geometry
-						Canvas.SetLeft(image, geometry.Bounds.Left);
-						Canvas.SetTop(image, geometry.Bounds.Top);
-
-						this.layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, null, image, null);
 					}
 				}
+			}
+			else
+			{
+				this.layer.RemoveAdornmentsByVisualSpan(new SnapshotSpan(line.Snapshot, lineSpan));
 			}
 		}
 	}
