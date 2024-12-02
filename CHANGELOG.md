@@ -1,5 +1,9 @@
 ﻿# VS Highlighter
 
+## 1.5 - Dec 2024
+
+- Prevent the creation of multiple highlights at the same position.
+
 ## 1.4 - Dec 2024
 
 - Show highlight indicators in the scrollbar.
