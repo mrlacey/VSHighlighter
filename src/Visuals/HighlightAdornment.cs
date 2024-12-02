@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
@@ -40,18 +41,20 @@ internal sealed class HighlightAdornment
 		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
 
 		// Use semi-opaque to not hide underlying text
-		byte fiftyPercent = 255 / 2;
+		//byte fiftyPercent = 255 / 2;
+		byte seventyPercent = (byte)(255 * 0.7);
+		var desiredOpacity = seventyPercent;
 
-		this.fuchsiaBrush = new SolidColorBrush(Color.FromArgb(fiftyPercent, Colors.Fuchsia.R, Colors.Fuchsia.G, Colors.Fuchsia.B));
+		this.fuchsiaBrush = new SolidColorBrush(Color.FromArgb(desiredOpacity, Colors.Fuchsia.R, Colors.Fuchsia.G, Colors.Fuchsia.B));
 		this.fuchsiaBrush.Freeze();
 
-		this.darkTurquoiseBrush = new SolidColorBrush(Color.FromArgb(fiftyPercent, Colors.DarkTurquoise.R, Colors.DarkTurquoise.G, Colors.DarkTurquoise.B));
+		this.darkTurquoiseBrush = new SolidColorBrush(Color.FromArgb(desiredOpacity, Colors.DarkTurquoise.R, Colors.DarkTurquoise.G, Colors.DarkTurquoise.B));
 		this.darkTurquoiseBrush.Freeze();
 
-		this.goldBrush = new SolidColorBrush(Color.FromArgb(fiftyPercent, Colors.Gold.R, Colors.Gold.G, Colors.Gold.B));
+		this.goldBrush = new SolidColorBrush(Color.FromArgb(desiredOpacity, Colors.Gold.R, Colors.Gold.G, Colors.Gold.B));
 		this.goldBrush.Freeze();
 
-		this.limeBrush = new SolidColorBrush(Color.FromArgb(fiftyPercent, Colors.Lime.R, Colors.Lime.G, Colors.Lime.B));
+		this.limeBrush = new SolidColorBrush(Color.FromArgb(desiredOpacity, Colors.Lime.R, Colors.Lime.G, Colors.Lime.B));
 		this.limeBrush.Freeze();
 
 		var penBrush = new SolidColorBrush(Colors.Transparent);
@@ -69,21 +72,26 @@ internal sealed class HighlightAdornment
 	private async void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
 #pragma warning restore VSTHRD100 // Avoid async void methods
 	{
-		System.Diagnostics.Debug.WriteLine("OnLayoutChanged");
-
+		System.Diagnostics.Debug.WriteLine("OnReloadHighlightsRequested");
 		try
 		{
-			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-			var span = msg.WholeDocument
-				? new SnapshotSpan(this.view.TextSnapshot, 0, this.view.TextSnapshot.Length)
-				: new SnapshotSpan(this.view.TextSnapshot, msg.RangeStart, msg.RangeLength);
-
-			var textViewLines = this.view.TextViewLines.GetTextViewLinesIntersectingSpan(span);
-
-			foreach (var line in textViewLines)
+			if (docFactory.TryGetTextDocument(this.view.TextBuffer, out ITextDocument document))
 			{
-				this.CreateVisuals(line);
+				if (msg.FileName == document.FilePath)
+				{
+					await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+					var span = msg.WholeDocument
+						? new SnapshotSpan(this.view.TextSnapshot, 0, this.view.TextSnapshot.Length)
+						: new SnapshotSpan(this.view.TextSnapshot, msg.RangeStart, msg.RangeLength);
+
+					var textViewLines = this.view.TextViewLines.GetTextViewLinesIntersectingSpan(span);
+
+					foreach (var line in textViewLines)
+					{
+						this.CreateVisuals(line);
+					}
+				}
 			}
 		}
 		catch (Exception exc)
@@ -136,92 +144,89 @@ internal sealed class HighlightAdornment
 
 			var lineSpan = new Span(line.Start, line.Length);
 
-			if (highlights.Any())
+			// Remove highlights from this line. They'll be re-drawn below if necessary.
+			// This avoids adornments being drawn multiple times.
+			this.layer.RemoveAdornmentsByVisualSpan(new SnapshotSpan(line.Snapshot, lineSpan));
+
+			foreach (var highlight in highlights)
 			{
-				foreach (var highlight in highlights)
+				var len = line.Snapshot.Length;
+
+				if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
 				{
-					var len = line.Snapshot.Length;
+					continue;
+				}
 
-					if (highlight.SpanStart >= len || (highlight.SpanStart + highlight.SpanLength) > len)
+				var highlightSpan = new SnapshotSpan(line.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
+
+				if (highlightSpan.IntersectsWith(lineSpan))
+				{
+					var spanToUse = lineSpan;
+
+					if (highlightSpan.Start < lineSpan.Start)
 					{
-						continue;
-					}
+						// Highlight starts before the line
 
-					var highlightSpan = new SnapshotSpan(line.Snapshot, new Span(highlight.SpanStart, highlight.SpanLength));
-
-					if (highlightSpan.IntersectsWith(lineSpan))
-					{
-						var spanToUse = lineSpan;
-
-						if (highlightSpan.Start < lineSpan.Start)
+						if (highlightSpan.End > lineSpan.End)
 						{
-							// Highlight starts before the line
-
-							if (highlightSpan.End > lineSpan.End)
-							{
-								// highlight goes longer than the line so highlight the whole line
-								spanToUse = lineSpan;
-							}
-							else
-							{
-								// Only highlight up to the relevant point in the current line
-								spanToUse = new Span(lineSpan.Start, highlightSpan.End - lineSpan.Start);
-							}
+							// highlight goes longer than the line so highlight the whole line
+							spanToUse = lineSpan;
 						}
 						else
 						{
-							// Highlight starts in the line
-
-							if (highlightSpan.End > lineSpan.End)
-							{
-								// Highlight goes longer than the line so highlight from the start of the highlight to the end of the line
-								spanToUse = new Span(highlightSpan.Start, lineSpan.End - highlightSpan.Start);
-							}
-							else
-							{
-								// Full highlight is within the line
-								spanToUse = highlightSpan.Span;
-							}
-						}
-
-						SnapshotSpan span = new(this.view.TextSnapshot, spanToUse);
-
-						Geometry geometry = textViewLines.GetMarkerGeometry(span);
-						if (geometry != null)
-						{
-							var brush = highlight.Color switch
-							{
-								HighlightColor.DarkTurquoise => this.darkTurquoiseBrush,
-								HighlightColor.Fuchsia => this.fuchsiaBrush,
-								HighlightColor.Gold => this.goldBrush,
-								_ => this.limeBrush,
-							};
-
-							var drawing = new GeometryDrawing(brush, this.pen, geometry);
-							drawing.Freeze();
-
-							var drawingImage = new DrawingImage(drawing);
-							drawingImage.Freeze();
-
-							var image = new Image
-							{
-								Source = drawingImage,
-							};
-
-							// Align the image with the top of the bounds of the text geometry
-							Canvas.SetLeft(image, geometry.Bounds.Left);
-							Canvas.SetTop(image, geometry.Bounds.Top);
-
-							System.Diagnostics.Debug.WriteLine($"Adding adornment.");
-
-							this.layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, null, image, null);
+							// Only highlight up to the relevant point in the current line
+							spanToUse = new Span(lineSpan.Start, highlightSpan.End - lineSpan.Start);
 						}
 					}
+					else
+					{
+						// Highlight starts in the line
+
+						if (highlightSpan.End > lineSpan.End)
+						{
+							// Highlight goes longer than the line so highlight from the start of the highlight to the end of the line
+							spanToUse = new Span(highlightSpan.Start, lineSpan.End - highlightSpan.Start);
+						}
+						else
+						{
+							// Full highlight is within the line
+							spanToUse = highlightSpan.Span;
+						}
+					}
+
+					SnapshotSpan span = new(this.view.TextSnapshot, spanToUse);
+
+					Geometry geometry = textViewLines.GetMarkerGeometry(span);
+					if (geometry != null)
+					{
+						var brush = highlight.Color switch
+						{
+							HighlightColor.DarkTurquoise => this.darkTurquoiseBrush,
+							HighlightColor.Fuchsia => this.fuchsiaBrush,
+							HighlightColor.Gold => this.goldBrush,
+							_ => this.limeBrush,
+						};
+
+						var drawing = new GeometryDrawing(brush, this.pen, geometry);
+						drawing.Freeze();
+
+						var drawingImage = new DrawingImage(drawing);
+						drawingImage.Freeze();
+
+						var image = new Image
+						{
+							Source = drawingImage,
+						};
+
+						// Align the image with the top of the bounds of the text geometry
+						Canvas.SetLeft(image, geometry.Bounds.Left);
+						Canvas.SetTop(image, geometry.Bounds.Top);
+
+						System.Diagnostics.Debug.WriteLine($"Adding adornment.");
+
+						this.layer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, null, image, null);
+					}
 				}
-			}
-			else
-			{
-				this.layer.RemoveAdornmentsByVisualSpan(new SnapshotSpan(line.Snapshot, lineSpan));
 			}
 		}
 	}
