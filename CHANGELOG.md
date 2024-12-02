@@ -1,5 +1,10 @@
 ﻿# VS Highlighter
 
+## 1.4 - Dec 2024
+
+- Show highlight indicators in the scrollbar.
+- Fix possible error when having multiple editors open.
+
 ## 1.3 - Dec 2024
 
 - Ensure highlights are removed from then editor when deleted ("cleared").
