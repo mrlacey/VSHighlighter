@@ -26,6 +26,9 @@ internal class ScrollBarMargin : Canvas, IWpfTextViewMargin
 		_scrollBar = marginContainer as IVerticalScrollBar;
 		_documentName = documentName;
 
+		// Prevent the control from intercepting clicks
+		this.IsHitTestVisible = false;
+
 		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
 	}
 
