@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.VisualStudio.Text;
 using Newtonsoft.Json;
 
 namespace VSHighlighter;
@@ -60,6 +62,18 @@ internal class HighlighterService
 		}
 	}
 
+	internal (int Start, int Length) GetHighlightSpan(string fileName, string id)
+	{
+		var highlightOfInterest = highlights.FirstOrDefault(x => x.FilePath == fileName && x.Id == id);
+
+		if (highlightOfInterest != null)
+		{
+			return (highlightOfInterest.SpanStart, highlightOfInterest.SpanLength);
+		}
+
+		return (-1, -1);
+	}
+
 	internal async Task AddHighlightAsync(string filePath, HighlightColor color, int lineNo, int start, int length)
 	{
 		var newHighlight = new Highlight
@@ -82,7 +96,7 @@ internal class HighlighterService
 
 		highlights.Add(newHighlight);
 
-		WeakReferenceMessenger.Default.Send<RequestReloadHighlights>(new RequestReloadHighlights(filePath, start, length));
+		WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(filePath, start, length));
 
 		await SaveAsync();
 	}
@@ -188,6 +202,23 @@ internal class HighlighterService
 		}
 
 		WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(filePath));
+
+		await SaveAsync();
+	}
+
+	internal async Task UpdateHighlightAsync(string fileName, string id, int start, int length)
+	{
+		var highlightOfInterest = highlights.FirstOrDefault(x => x.FilePath == fileName && x.Id == id);
+
+		if (highlightOfInterest == null)
+		{
+			System.Diagnostics.Debug.WriteLine($"Failed to find highlight to update '{fileName}' : {id}");
+
+			return;
+		}
+
+		highlightOfInterest.SpanStart = start;
+		highlightOfInterest.SpanLength = length;
 
 		await SaveAsync();
 	}

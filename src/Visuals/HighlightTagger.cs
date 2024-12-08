@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
+using VSHighlighter.Messaging;
 
 namespace VSHighlighter.Visuals;
 
@@ -11,56 +14,74 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 {
 	private ITextView _textView;
 	private ITextBuffer _buffer;
+	private string _fileName;
 
-	Dictionary<ITrackingSpan, (string id, HighlightColor color)> _trackingSpans = [];
+	Dictionary<ITrackingSpan, (string Id, HighlightColor Color)> _trackingSpans = [];
 
 	public HighlightTagger(ITextView textView, ITextBuffer buffer)
 	{
 		_textView = textView;
 		_buffer = buffer;
+
+		_buffer.Properties.TryGetProperty(typeof(ITextDocument), out ITextDocument document);
+		_fileName = document?.FilePath ?? string.Empty;
+
 		//_documentationAddedListener = new DelegateListener<DocumentationAddedEvent>(OnDocumentationAdded);
 		//_eventAggregator.AddListener<DocumentationAddedEvent>(_documentationAddedListener);
 		//_documentSavedListener = new DelegateListener<DocumentSavedEvent>(OnDocumentSaved);
 		//_eventAggregator.AddListener<DocumentSavedEvent>(_documentSavedListener);
 
-		//_documentatiClosedListener = new DelegateListener<DocumentClosedEvent>(OnDocumentatClosed);
-
-		//_eventAggregator.AddListener<DocumentClosedEvent>(_documentatiClosedListener);
 		//_documentationUpdatedListener = new DelegateListener<DocumentationUpdatedEvent>(OnDocumentationUpdated);
 		//_eventAggregator.AddListener<DocumentationUpdatedEvent>(_documentationUpdatedListener);
-		//_documentationDeletedListener = new DelegateListener<DocumentationDeletedEvent>(OnDocumentationDeleted);
-		//_eventAggregator.AddListener<DocumentationDeletedEvent>(_documentationDeletedListener);
 
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
+		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
 
-		//TODO: Add event aggregator listener to documentation changed on tracking Span X
-		//TODO: Add event aggregator listener to documentation deleted on tracking Span X
+		WeakReferenceMessenger.Default.Register<DocumentSavedNotification>(this, async (r, msg) =>
+		{
+			if (msg.FileName == _fileName)
+			{
+				try
+				{
+					await RemoveEmptyTrackingSpans();
+
+					await UpdateSpanPositions();
+				}
+				catch (Exception exc)
+				{
+					await OutputPane.Instance.WriteAsync("Error handling file save for: " + msg.FileName);
+					await OutputPane.Instance.WriteAsync(exc.Message);
+					await OutputPane.Instance.WriteAsync(exc.StackTrace);
+					await OutputPane.Instance.ActivateAsync();
+				}
+			}
+		});
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
 
 		CreateTrackingSpans();
 	}
 
-	//private void OnDocumentatClosed(DocumentClosedEvent obj)
-	//{
-	//	if (obj.DocumentFullName == _filename)
-	//	{
-	//		_eventAggregator.RemoveListener(_documentationAddedListener);
-	//		_eventAggregator.RemoveListener(_documentSavedListener);
-	//		_eventAggregator.RemoveListener(_documentationUpdatedListener);
-	//		_eventAggregator.RemoveListener(_documentatiClosedListener);
-	//	}
+	// This is like CreateTrackingSpans but adds new ones
+	private void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
+	{
+		var highlights = HighlighterService.Instance.GetHighlights(_fileName);
 
-	//}
+		System.Diagnostics.Debug.WriteLine($"Found {highlights.Count()} highlights in '{_fileName}'.");
+
+		foreach (var highlight in highlights)
+		{
+			if (!_trackingSpans.Values.Any(v => v.Id == highlight.Id))
+			{
+				var newTs = _buffer.CurrentSnapshot.CreateTrackingSpan(highlight.SpanStart, highlight.SpanLength, SpanTrackingMode.EdgeExclusive);
+
+				_trackingSpans.Add(newTs, (highlight.Id, highlight.Color));
+			}
+		}
+	}
 
 	private void CreateTrackingSpans()
 	{
-		_buffer.Properties.TryGetProperty(typeof(ITextDocument), out ITextDocument document);
-		var fileName = document?.FilePath;
-
-		if (string.IsNullOrEmpty(fileName))
-		{
-			return;
-		}
-
-		var highlights = HighlighterService.Instance.GetHighlights(fileName);
+		var highlights = HighlighterService.Instance.GetHighlights(_fileName);
 
 		System.Diagnostics.Debug.WriteLine($"Found {highlights.Count()} highlights in file.");
 
@@ -111,13 +132,30 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 		//	document.Saved = false;
 	}
 
-	private void RemoveEmptyTrackingSpans()
+	private async Task RemoveEmptyTrackingSpans()
 	{
 		var currentSnapshot = _buffer.CurrentSnapshot;
 		var keysToRemove = _trackingSpans.Keys.Where(ts => ts.GetSpan(currentSnapshot).Length == 0).ToList();
 		foreach (var key in keysToRemove)
 		{
 			_trackingSpans.Remove(key);
+			await HighlighterService.Instance.RemoveHighlightAsync(_trackingSpans[key].Id);
+		}
+	}
+
+	private async Task UpdateSpanPositions()
+	{
+		var currentSnapshot = _buffer.CurrentSnapshot;
+
+		foreach (var trackingSpan in _trackingSpans)
+		{
+			var span = trackingSpan.Key.GetSpan(currentSnapshot);
+			var (start, length) = HighlighterService.Instance.GetHighlightSpan(_fileName, trackingSpan.Value.Id);
+
+			if (start != span.Start || length != span.Length)
+			{
+				await HighlighterService.Instance.UpdateHighlightAsync(_fileName, trackingSpan.Value.Id, span.Start.Position, span.Length);
+			}
 		}
 	}
 
@@ -160,11 +198,14 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 
 	public IEnumerable<ITagSpan<VsHighlightTag>> GetTags(NormalizedSnapshotSpanCollection spans)
 	{
-		List<ITagSpan<VsHighlightTag>> tags = new List<ITagSpan<VsHighlightTag>>();
-		if (spans.Count == 0)
-			return tags;
+		List<ITagSpan<VsHighlightTag>> tags = [];
 
-		var relevantSnapshot = spans.First().Snapshot;//_buffer.CurrentSnapshot;
+		if (spans.Count == 0)
+		{
+			return tags;
+		}
+
+		var relevantSnapshot = spans.First().Snapshot;
 
 		foreach (var trackingSpan in _trackingSpans)
 		{
@@ -174,7 +215,7 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 			{
 				var snapshotSpan = new SnapshotSpan(relevantSnapshot, spanInCurrentSnapshot);
 
-				tags.Add(new TagSpan<VsHighlightTag>(snapshotSpan, GetTagForColor(trackingSpan.Value.color)));
+				tags.Add(new TagSpan<VsHighlightTag>(snapshotSpan, GetTagForColor(trackingSpan.Value.Color)));
 			}
 		}
 
