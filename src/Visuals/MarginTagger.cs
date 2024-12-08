@@ -21,6 +21,8 @@ internal class MarginTagger : ITagger<MarginTag>
 		this.docFactory = docFactory;
 		this.textBuffer = textBuffer;
 
+		//this.textBuffer.Changed += (sender, args) => HandleTextBufferChanged(args);
+
 		if (docFactory.TryGetTextDocument(textBuffer, out ITextDocument document))
 		{
 			documentName = document.FilePath;
@@ -28,6 +30,21 @@ internal class MarginTagger : ITagger<MarginTag>
 
 		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
 	}
+
+	//private void HandleTextBufferChanged(TextContentChangedEventArgs args)
+	//{
+	//	System.Diagnostics.Debug.WriteLine("Text buffer changed");
+	//	System.Diagnostics.Debug.WriteLine("Changes");
+	//	System.Diagnostics.Debug.WriteLine(args.Changes.Count);
+	//	if (args.Changes.Count > 0)
+	//	{
+	//		System.Diagnostics.Debug.WriteLine(args.Changes[0].ToString());
+	//	}
+	//	System.Diagnostics.Debug.WriteLine("Before");
+	//	System.Diagnostics.Debug.WriteLine(args.Before);
+	//	System.Diagnostics.Debug.WriteLine("After");
+	//	System.Diagnostics.Debug.WriteLine(args.After);
+	//}
 
 	~MarginTagger()
 	{

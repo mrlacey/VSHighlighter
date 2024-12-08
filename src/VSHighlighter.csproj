@@ -65,15 +65,24 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
-    <Compile Include="Visuals\HighlightAdornment.cs" />
-    <Compile Include="Visuals\HighlightAdornmentTextViewCreationListener.cs" />
+    <Compile Include="Visuals\FuchsiaHighlightFormatDefinition.cs" />
+    <Compile Include="Visuals\FuchsiaHighlightTag.cs" />
+    <Compile Include="Visuals\GoldHighlightFormatDefinition.cs" />
+    <Compile Include="Visuals\GoldHighlightTag.cs" />
+    <Compile Include="Visuals\HighlightTagger.cs" />
+    <Compile Include="Visuals\LimeHighlightFormatDefinition.cs" />
+    <Compile Include="Visuals\LimeHighlightTag.cs" />
     <Compile Include="Visuals\MarginGlyphFactory.cs" />
     <Compile Include="Visuals\MarginGlyphFactoryProvider.cs" />
     <Compile Include="Visuals\MarginTag.cs" />
     <Compile Include="Visuals\MarginTagger.cs" />
     <Compile Include="Visuals\MarginTaggerProvider.cs" />
+    <Compile Include="Visuals\MyHighlighterTaggerProvider.cs" />
     <Compile Include="Visuals\ScrollBarMargin.cs" />
     <Compile Include="Visuals\ScrollBarMarginFactory.cs" />
+    <Compile Include="Visuals\TurquoiseHighlightFormatDefinition.cs" />
+    <Compile Include="Visuals\TurquoiseHighlightTag.cs" />
+    <Compile Include="Visuals\VsHighlightTag.cs" />
     <Compile Include="VSHighlighterPackage.cs" />
     <Compile Include="VSHighlighterPackage1.cs">
       <AutoGen>True</AutoGen>
