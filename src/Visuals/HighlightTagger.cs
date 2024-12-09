@@ -18,21 +18,12 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 
 	Dictionary<ITrackingSpan, (string Id, HighlightColor Color)> _trackingSpans = [];
 
-	public HighlightTagger(ITextView textView, ITextBuffer buffer)
+	public HighlightTagger(ITextView textView, ITextBuffer buffer, string fileName)
 	{
 		_textView = textView;
 		_buffer = buffer;
 
-		_buffer.Properties.TryGetProperty(typeof(ITextDocument), out ITextDocument document);
-		_fileName = document?.FilePath ?? string.Empty;
-
-		//_documentationAddedListener = new DelegateListener<DocumentationAddedEvent>(OnDocumentationAdded);
-		//_eventAggregator.AddListener<DocumentationAddedEvent>(_documentationAddedListener);
-		//_documentSavedListener = new DelegateListener<DocumentSavedEvent>(OnDocumentSaved);
-		//_eventAggregator.AddListener<DocumentSavedEvent>(_documentSavedListener);
-
-		//_documentationUpdatedListener = new DelegateListener<DocumentationUpdatedEvent>(OnDocumentationUpdated);
-		//_eventAggregator.AddListener<DocumentationUpdatedEvent>(_documentationUpdatedListener);
+		_fileName = fileName;
 
 #pragma warning disable VSTHRD101 // Avoid unsupported async delegates
 		WeakReferenceMessenger.Default.Register<RequestReloadHighlights>(this, OnReloadHighlightsRequested);
@@ -43,9 +34,9 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 			{
 				try
 				{
-					await RemoveEmptyTrackingSpans();
+					await RemoveEmptyTrackingSpansAsync();
 
-					await UpdateSpanPositions();
+					await UpdateSpanPositionsAsync();
 				}
 				catch (Exception exc)
 				{
@@ -61,12 +52,14 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 		CreateTrackingSpans();
 	}
 
-	// This is like CreateTrackingSpans but adds new ones
+	// This is like CreateTrackingSpans but adds new ones and removes other ones
 	private void OnReloadHighlightsRequested(object recipient, RequestReloadHighlights msg)
 	{
 		var highlights = HighlighterService.Instance.GetHighlights(_fileName);
 
 		System.Diagnostics.Debug.WriteLine($"Found {highlights.Count()} highlights in '{_fileName}'.");
+
+		bool changesMade = false;
 
 		foreach (var highlight in highlights)
 		{
@@ -75,7 +68,32 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 				var newTs = _buffer.CurrentSnapshot.CreateTrackingSpan(highlight.SpanStart, highlight.SpanLength, SpanTrackingMode.EdgeExclusive);
 
 				_trackingSpans.Add(newTs, (highlight.Id, highlight.Color));
+				changesMade = true;
 			}
+		}
+
+		IList<ITrackingSpan> _tsToRemove = [];
+
+		foreach (var ts in _trackingSpans)
+		{
+			if (msg.WholeDocument || (ts.Key.GetSpan(_buffer.CurrentSnapshot).IntersectsWith(new SnapshotSpan(_buffer.CurrentSnapshot, new Span(msg.RangeStart, msg.RangeLength)))))
+			{
+				if (!highlights.Any(h => h.Id == ts.Value.Id))
+				{
+					_tsToRemove.Add(ts.Key);
+					changesMade = true;
+				}
+			}
+		}
+
+		foreach (var item in _tsToRemove)
+		{
+			_trackingSpans.Remove(item);
+		}
+
+		if (changesMade)
+		{
+			TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, new Span(msg.RangeStart, msg.RangeLength))));
 		}
 	}
 
@@ -93,46 +111,7 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 		}
 	}
 
-	//private void OnDocumentSaved(DocumentSavedEvent documentSavedEvent)
-	//{
-	//	if (documentSavedEvent.DocumentFullName == _filename)
-	//	{
-	//		RemoveEmptyTrackingSpans();
-	//		FileDocumentation fileDocumentation = CreateFileDocumentationFromTrackingSpans();
-	//		DocumentationFileSerializer.Serialize(CodyDocsFilename, fileDocumentation);
-	//	}
-	//}
-
-	//private void OnDocumentationUpdated(DocumentationUpdatedEvent ev)
-	//{
-	//	if (_trackingSpans.ContainsKey(ev.TrackingSpan))
-	//	{
-	//		_trackingSpans[ev.TrackingSpan] = ev.NewDocumentation;
-	//		TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(
-	//			new SnapshotSpan(_buffer.CurrentSnapshot, ev.TrackingSpan.GetSpan(_buffer.CurrentSnapshot))));
-	//		MarkDocumentAsUnsaved();
-	//	}
-	//}
-
-	//private void OnDocumentationDeleted(DocumentationDeletedEvent ev)
-	//{
-	//	if (_trackingSpans.ContainsKey(ev.Tag.TrackingSpan))
-	//	{
-	//		_trackingSpans.Remove(ev.Tag.TrackingSpan);
-	//		TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(
-	//			new SnapshotSpan(_buffer.CurrentSnapshot, ev.Tag.TrackingSpan.GetSpan(_buffer.CurrentSnapshot))));
-	//		MarkDocumentAsUnsaved();
-	//	}
-	//}
-
-	private void MarkDocumentAsUnsaved()
-	{
-		//Document document = DocumentLifetimeManager.GetDocument(_filename);
-		//if (document != null)
-		//	document.Saved = false;
-	}
-
-	private async Task RemoveEmptyTrackingSpans()
+	private async Task RemoveEmptyTrackingSpansAsync()
 	{
 		var currentSnapshot = _buffer.CurrentSnapshot;
 		var keysToRemove = _trackingSpans.Keys.Where(ts => ts.GetSpan(currentSnapshot).Length == 0).ToList();
@@ -143,7 +122,7 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 		}
 	}
 
-	private async Task UpdateSpanPositions()
+	private async Task UpdateSpanPositionsAsync()
 	{
 		var currentSnapshot = _buffer.CurrentSnapshot;
 
@@ -158,41 +137,6 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 			}
 		}
 	}
-
-	//private FileDocumentation CreateFileDocumentationFromTrackingSpans()
-	//{
-	//	var currentSnapshot = _buffer.CurrentSnapshot;
-	//	List<DocumentationFragment> fragments = _trackingSpans
-	//		.Select(ts => new DocumentationFragment()
-	//		{
-	//			Selection = new TextViewSelection()
-	//			{
-	//				StartPosition = ts.Key.GetStartPoint(currentSnapshot),
-	//				EndPosition = ts.Key.GetEndPoint(currentSnapshot),
-	//				Text = ts.Key.GetText(currentSnapshot)
-	//			},
-	//			Documentation = ts.Value,
-
-	//		}).ToList();
-
-	//	var fileDocumentation = new FileDocumentation() { Fragments = fragments };
-	//	return fileDocumentation;
-	//}
-
-	//private void OnDocumentationAdded(DocumentationAddedEvent e)
-	//{
-
-	//	string filepath = e.Filepath;
-	//	if (filepath == CodyDocsFilename)
-	//	{
-	//		var span = e.DocumentationFragment.GetSpan();
-	//		var trackingSpan = _buffer.CurrentSnapshot.CreateTrackingSpan(span, SpanTrackingMode.EdgeExclusive);
-	//		_trackingSpans.Add(trackingSpan, e.DocumentationFragment.Documentation);
-	//		TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(
-	//			new SnapshotSpan(_buffer.CurrentSnapshot, span)));
-	//		MarkDocumentAsUnsaved();
-	//	}
-	//}
 
 	public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 

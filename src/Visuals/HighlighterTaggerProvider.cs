@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -23,8 +24,15 @@ public class HighlightTaggerProvider : IViewTaggerProvider
 		if (textView.TextBuffer != buffer)
 			return null;
 
+		buffer.Properties.TryGetProperty(typeof(ITextDocument), out ITextDocument document);
+		
+		if (string.IsNullOrWhiteSpace(document?.FilePath ?? string.Empty))
+		{
+			return null;
+		}
+
 		return buffer.Properties.GetOrCreateSingletonProperty(
 			nameof(HighlightTaggerProvider),
-			() => new HighlightTagger(textView, buffer) as ITagger<T>);
+			() => new HighlightTagger(textView, buffer, document.FilePath) as ITagger<T>);
 	}
 }
