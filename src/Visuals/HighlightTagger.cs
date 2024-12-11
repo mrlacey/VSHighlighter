@@ -93,7 +93,14 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 
 		if (changesMade)
 		{
-			TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, new Span(msg.RangeStart, msg.RangeLength))));
+			if (msg.WholeDocument)
+			{
+				TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, new Span(0, _buffer.CurrentSnapshot.Length))));
+			}
+			else
+			{
+				TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, new Span(msg.RangeStart, msg.RangeLength))));
+			}
 		}
 	}
 
