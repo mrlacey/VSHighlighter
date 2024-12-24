@@ -115,6 +115,7 @@ internal class HighlighterService
 			{
 				System.Diagnostics.Debug.WriteLine($"Removing highlight {item.Id}");
 
+				removalFilePath = item.FilePath;
 				removalStart = item.SpanStart;
 				removalLength = item.SpanLength;
 
