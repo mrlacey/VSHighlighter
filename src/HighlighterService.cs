@@ -206,7 +206,7 @@ internal class HighlighterService
 		await SaveAsync();
 	}
 
-	internal async Task UpdateHighlightAsync(string fileName, string id, int start, int length)
+	internal async Task UpdateHighlightAsync(string fileName, string id, int lineNo, int start, int length)
 	{
 		var highlightOfInterest = highlights.FirstOrDefault(x => x.FilePath == fileName && x.Id == id);
 
@@ -217,6 +217,7 @@ internal class HighlighterService
 			return;
 		}
 
+		highlightOfInterest.LineNumber = lineNo;
 		highlightOfInterest.SpanStart = start;
 		highlightOfInterest.SpanLength = length;
 

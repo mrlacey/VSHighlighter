@@ -34,9 +34,15 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 			{
 				try
 				{
-					await RemoveEmptyTrackingSpansAsync();
+					var anyRemoved = await RemoveEmptyTrackingSpansAsync();
 
-					await UpdateSpanPositionsAsync();
+					var anyUpdated = await UpdateSpanPositionsAsync();
+
+					if (anyRemoved || anyUpdated)
+					{
+						// If any positions have changed, may need to tell the glyphs and scrollbar images to redraw
+						WeakReferenceMessenger.Default.Send(new RequestReloadHighlights(_fileName));
+					}
 				}
 				catch (Exception exc)
 				{
@@ -118,19 +124,26 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 		}
 	}
 
-	private async Task RemoveEmptyTrackingSpansAsync()
+	private async Task<bool> RemoveEmptyTrackingSpansAsync()
 	{
+		var result = false;
+
 		var currentSnapshot = _buffer.CurrentSnapshot;
 		var keysToRemove = _trackingSpans.Keys.Where(ts => ts.GetSpan(currentSnapshot).Length == 0).ToList();
+
 		foreach (var key in keysToRemove)
 		{
 			_trackingSpans.Remove(key);
 			await HighlighterService.Instance.RemoveHighlightAsync(_trackingSpans[key].Id);
+			result = true;
 		}
+
+		return result;
 	}
 
-	private async Task UpdateSpanPositionsAsync()
+	private async Task<bool> UpdateSpanPositionsAsync()
 	{
+		var result = false;
 		var currentSnapshot = _buffer.CurrentSnapshot;
 
 		foreach (var trackingSpan in _trackingSpans)
@@ -138,11 +151,16 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 			var span = trackingSpan.Key.GetSpan(currentSnapshot);
 			var (start, length) = HighlighterService.Instance.GetHighlightSpan(_fileName, trackingSpan.Value.Id);
 
+
+
 			if (start != span.Start || length != span.Length)
 			{
-				await HighlighterService.Instance.UpdateHighlightAsync(_fileName, trackingSpan.Value.Id, span.Start.Position, span.Length);
+				await HighlighterService.Instance.UpdateHighlightAsync(_fileName, trackingSpan.Value.Id, span.Start.GetContainingLineNumber(), span.Start.Position, span.Length);
+				result = true;
 			}
 		}
+
+		return result;
 	}
 
 	public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
