@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -25,7 +24,7 @@ public class HighlightTaggerProvider : IViewTaggerProvider
 			return null;
 
 		buffer.Properties.TryGetProperty(typeof(ITextDocument), out ITextDocument document);
-		
+
 		if (string.IsNullOrWhiteSpace(document?.FilePath ?? string.Empty))
 		{
 			return null;

@@ -151,8 +151,6 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 			var span = trackingSpan.Key.GetSpan(currentSnapshot);
 			var (start, length) = HighlighterService.Instance.GetHighlightSpan(_fileName, trackingSpan.Value.Id);
 
-
-
 			if (start != span.Start || length != span.Length)
 			{
 				await HighlighterService.Instance.UpdateHighlightAsync(_fileName, trackingSpan.Value.Id, span.Start.GetContainingLineNumber(), span.Start.Position, span.Length);

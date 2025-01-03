@@ -1,9 +1,6 @@
 ﻿using System.Windows;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.Threading;
 
 namespace VSHighlighter.Visuals;
 
