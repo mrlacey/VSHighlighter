@@ -24,7 +24,7 @@ internal class BaseHighlightCommand
 			if (!(await this.ServiceProvider.GetServiceAsync(typeof(SVsTextManager)) is IVsTextManager textManager))
 			{
 				// If we fail to get the text manager, we can't get the active view.
-				await OutputPane.Instance.WriteAsync("Unable to highlight the selection: failed to get the text manager.");
+				await OutputPane.Instance.WriteAsync("Unable to highlight the selection: Failed to get the text manager.");
 			}
 			else
 			{
@@ -33,7 +33,7 @@ internal class BaseHighlightCommand
 				if (textView == null)
 				{
 					// If we fail to get the active view, we can't get the WPF view.
-					await OutputPane.Instance.WriteAsync("Unable to highlight the selection: failed to get the text view.");
+					await OutputPane.Instance.WriteAsync("Unable to highlight the selection: Failed to get the text view.");
 				}
 				else
 				{
@@ -69,12 +69,12 @@ internal class BaseHighlightCommand
 						}
 						else
 						{
-							await OutputPane.Instance.WriteAsync("Unable to highlight the selection: failed to get the path of the file.");
+							await OutputPane.Instance.WriteAsync("Unable to highlight the selection: Failed to get the path of the file.");
 						}
 					}
 					else
 					{
-						await OutputPane.Instance.WriteAsync("Unable to highlight the selection: failed to get the editor adapter.");
+						await OutputPane.Instance.WriteAsync("Unable to highlight the selection: Failed to get the editor adapter.");
 					}
 				}
 			}

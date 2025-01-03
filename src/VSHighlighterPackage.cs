@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -33,6 +30,8 @@ public sealed class VSHighlighterPackage : AsyncPackage
 		await HighlightLime.InitializeAsync(this);
 		await ClearHighlight.InitializeAsync(this);
 		await ClearAllHighlights.InitializeAsync(this);
+
+		await SetUpRunningDocumentTableEventsAsync(cancellationToken);
 
 		await TrackBasicUsageAnalyticsAsync();
 	}
@@ -86,5 +85,16 @@ public sealed class VSHighlighterPackage : AsyncPackage
 				shell.LoadPackage(ref PackageGuids.guidVSHighlighterPackage, out _);
 			}
 		}
+	}
+
+	private async Task SetUpRunningDocumentTableEventsAsync(CancellationToken cancellationToken)
+	{
+		await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+		var runningDocumentTable = new RunningDocumentTable(this);
+
+		var plugin = new VsHighlighterRunningDocTableEvents(this, runningDocumentTable);
+
+		runningDocumentTable.Advise(plugin);
 	}
 }
