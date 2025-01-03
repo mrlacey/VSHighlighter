@@ -1,5 +1,9 @@
 ﻿# VS Highlighter
 
+## 2.0 - Jan 2025
+
+- Improve handling of existing highlights when the file is changed.
+
 ## 1.5 - Dec 2024
 
 - Prevent the creation of multiple highlights at the same position.
