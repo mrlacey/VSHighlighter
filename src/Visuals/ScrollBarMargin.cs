@@ -14,7 +14,7 @@ namespace VSHighlighter.Visuals;
 internal class ScrollBarMargin : Canvas, IWpfTextViewMargin
 {
 	private bool _isDisposed;
-	private static double _lineWidth = 200, _lineHeight = 5;
+	private static double _lineWidth = 200, _lineHeight = 2;
 	private readonly IVerticalScrollBar _scrollBar;
 	private readonly string _documentName;
 	private bool _isDoingDelayRetry = false;
