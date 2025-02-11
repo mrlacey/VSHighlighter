@@ -13,7 +13,7 @@ internal class FuchsiaHighlightFormatDefinition : MarkerFormatDefinition
 	public FuchsiaHighlightFormatDefinition()
 	{
 		var background = Brushes.Fuchsia.Clone();
-		background.Opacity = 0.7;
+		background.Opacity = SharedVisualSettings.HighlightOpacity;
 		this.Fill = background;
 		this.Border = new Pen(Brushes.Transparent, 1.0);
 		this.DisplayName = "Fuchsia Highlight";

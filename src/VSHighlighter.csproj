@@ -82,6 +82,7 @@
     <Compile Include="Visuals\HighlighterTaggerProvider.cs" />
     <Compile Include="Visuals\ScrollBarMargin.cs" />
     <Compile Include="Visuals\ScrollBarMarginFactory.cs" />
+    <Compile Include="Visuals\SharedVisualSettings.cs" />
     <Compile Include="Visuals\TurquoiseHighlightFormatDefinition.cs" />
     <Compile Include="Visuals\TurquoiseHighlightTag.cs" />
     <Compile Include="Visuals\VsHighlightTag.cs" />

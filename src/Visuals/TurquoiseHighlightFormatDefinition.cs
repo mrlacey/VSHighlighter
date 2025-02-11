@@ -13,7 +13,7 @@ internal class TurquoiseHighlightFormatDefinition : MarkerFormatDefinition
 	public TurquoiseHighlightFormatDefinition()
 	{
 		var background = Brushes.Turquoise.Clone();
-		background.Opacity = 0.7;
+		background.Opacity = SharedVisualSettings.HighlightOpacity;
 		this.Fill = background;
 		this.Border = new Pen(Brushes.Transparent, 1.0);
 		this.DisplayName = "Turquoise Highlight";
