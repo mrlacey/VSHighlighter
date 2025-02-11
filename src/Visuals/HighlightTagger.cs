@@ -32,11 +32,17 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 		{
 			if (msg.FileName == _fileName)
 			{
+				var additionalDebugInfo = "start";
+
 				try
 				{
 					var anyRemoved = await RemoveEmptyTrackingSpansAsync();
 
+					additionalDebugInfo = $"After RemoveEmptyTrackingSpansAsync, anyRemoved={anyRemoved}";
+
 					var anyUpdated = await UpdateSpanPositionsAsync();
+
+					additionalDebugInfo = $"After UpdateSpanPositionsAsync, anyRemoved={anyRemoved} , anyUpdated={anyUpdated}";
 
 					if (anyRemoved || anyUpdated)
 					{
@@ -46,6 +52,7 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 				}
 				catch (Exception exc)
 				{
+					await OutputPane.Instance.WriteAsync(additionalDebugInfo);
 					await OutputPane.Instance.WriteAsync("Error handling file save for: " + msg.FileName);
 					await OutputPane.Instance.WriteAsync(exc.Message);
 					await OutputPane.Instance.WriteAsync(exc.StackTrace);
@@ -133,8 +140,8 @@ public class HighlightTagger : ITagger<VsHighlightTag>
 
 		foreach (var key in keysToRemove)
 		{
-			_trackingSpans.Remove(key);
 			await HighlighterService.Instance.RemoveHighlightAsync(_trackingSpans[key].Id);
+			_trackingSpans.Remove(key);
 			result = true;
 		}
 
