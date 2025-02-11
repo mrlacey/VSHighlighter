@@ -1,5 +1,11 @@
 ﻿# VS Highlighter
 
+## 2.1 - Feb 2025
+
+- Standardize highlight color brightness (opacity).
+- Make scrollbar indicator smaller.
+- Fix possible bug when saving files after lots of highlight changes.
+
 ## 2.0 - Jan 2025
 
 - Improve handling of existing highlights when the file is changed.
