@@ -25,6 +25,8 @@ public sealed class VSHighlighterPackage : AsyncPackage
 	{
 		await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
+		await OutputPane.Instance.WriteAsync($"{Vsix.Name} v{Vsix.Version}");
+
 		Instance = this;
 
 		await HighlightFuchsia.InitializeAsync(this);
